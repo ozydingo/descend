@@ -31,6 +31,8 @@ gem 'spring',        group: :development
 
 gem 'puma'
 
+# gem 'sciruby', '~> 0.1.3'
+gem 'haml', '~> 3.1.4'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
