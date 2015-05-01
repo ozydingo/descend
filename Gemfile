@@ -31,7 +31,8 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 
 gem 'puma'
 
-# gem 'sciruby', '~> 0.1.3'
+#gem 'sciruby', '~> 0.1.0'
+gem 'statsample', "~> 1.3.0"
 gem 'haml-rails', '~> 0.9.0'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
