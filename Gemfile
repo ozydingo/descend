@@ -32,7 +32,7 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'puma'
 
 # gem 'sciruby', '~> 0.1.3'
-gem 'haml-rails', '~> 4.0.6'
+gem 'haml-rails', '~> 0.9.0'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
