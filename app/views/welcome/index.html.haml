@@ -1,3 +1,8 @@
 %h1 Descend
 
-%p Coming not so soon...
+%div{id: "placeholder", style: "width:600px;height:300px" }
+
+:javascript
+  $(document).ready( function() {
+    $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ], { yaxis: { max: 1 } });
+  } );

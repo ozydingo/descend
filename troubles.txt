@@ -1,0 +1,6 @@
+Error: nokogiri fails with "libxml2 is missing."
+From: http://stackoverflow.com/questions/6277456/nokogiri-installation-fails-libxml2-is-missing
+Do:
+NOKOGIRI_USE_SYSTEM_LIBRARIES=1 gem install nokogiri
+# if above still fails, try this first
+sudo port install libxml2 libxslt libiconv
