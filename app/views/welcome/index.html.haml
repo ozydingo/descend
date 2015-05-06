@@ -1,8 +1,32 @@
 %h1 Descend
 
-%div{id: "placeholder", style: "width:600px;height:300px" }
+%div{id: "theGraph", style: "width:600px;height:300px" }
 
 :javascript
+  function plotIt(data) {
+    $.plot("#theGraph", [data],
+      {
+        series: {points: {show: true}},
+        grid: {clickable: true}
+      }
+    );      
+  }
+
   $(document).ready( function() {
-    $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ], { yaxis: { max: 1 } });
+    var data = []
+    var N = 5
+    for (var ii = 0; ii <= N; ii++) {
+      x = Math.random();
+      y = 2*x + Math.random() * 0.5;
+      data.push([x,y])
+    }
+    plotIt(data);
+
+    $("#theGraph").bind("plotclick", function(event, pos, item){
+      x = pos.x; y = pos.y;
+      data.push([pos.x, pos.y]);
+      plotIt(data);
+
+    });
+
   } );
