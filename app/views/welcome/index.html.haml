@@ -7,7 +7,9 @@
     $.plot("#theGraph", [data],
       {
         series: {points: {show: true}},
-        grid: {clickable: true}
+        grid: {clickable: true},
+        xaxis: {min: 0, max: 1},
+        yaxis: {min: 0, max: 1}
       }
     );      
   }
@@ -17,7 +19,7 @@
     var N = 5
     for (var ii = 0; ii <= N; ii++) {
       x = Math.random();
-      y = 2*x + Math.random() * 0.5;
+      y = 0.3*x + Math.random() * 0.5;
       data.push([x,y])
     }
     plotIt(data);
@@ -25,8 +27,8 @@
     $("#theGraph").bind("plotclick", function(event, pos, item){
       x = pos.x; y = pos.y;
       data.push([pos.x, pos.y]);
+      while (data.length > 10) {data.shift()}
       plotIt(data);
-
     });
 
   } );
