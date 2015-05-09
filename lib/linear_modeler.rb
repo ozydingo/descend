@@ -4,7 +4,6 @@ class LinearModeler
     options = options.reverse_merge(
       cost_function: :mse,
     )
-#    @num_features > 0 or raise "Must have at least 1 feature"
     @cost_function = options[:cost_function]
   end
 

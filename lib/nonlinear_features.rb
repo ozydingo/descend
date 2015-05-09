@@ -20,7 +20,7 @@ class NonlinearFeatures
     noise = noise.to_f
     e = Matrix.column_vector(mm.times.map{@grng.call * noise})
     data = self.generate(xx)
-    cols = data.t.to_a
-    return data * Matrix.column_vector(coefs) + e
+    output = data * Matrix.column_vector(coefs) + e
+    return data, output
   end
 end
