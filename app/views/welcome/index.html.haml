@@ -1,9 +1,18 @@
 %h1 Descend
 
+%span Max data points:&nbsp;
+%input{id: "var_maxN", type: "text", value: "25"}
 %div{id: "theGraph", style: "width:600px;height:300px" }
+%p{id: "btn_clear"}= link_to("Clear", "#")
 
 :javascript
-  var plot = null
+  $("#btn_clear").click(clearData);
+  function clearData() {
+    xyData = [];
+    updateFit(xyData);
+  }
+
+  var plot = null;
 
   function plotIt(xyData) {
     plot = $.plot("#theGraph",
@@ -20,11 +29,16 @@
   }
 
   function updateFit(xyData) {
-    coefs = computeFit(xyData);
-    plotFit(coefs);
+    if (xyData.length > 0) {
+      coefs = computeFit(xyData);
+      plotFit(coefs);
+    } else {
+      plotIt([]);
+    }
   }
 
   function computeFit(xyData) {
+    if (xyData.length == 0) return null;
     xPoints = xyData.map(function(xy){return xy[0]});
     yPoints = xyData.map(function(xy){return xy[1]});
     xData = nlFeatures(xPoints);
@@ -36,13 +50,12 @@
   function plotFit(coefs) {
     var xMin = plot.getAxes().xaxis.min;
     var xMax = plot.getAxes().xaxis.max;
-    xStep = (xMax - xMin) / 50
-    xVals = math.range(xMin, xMax + xStep, xStep)._data
-    fMatrix = nlFeatures(xVals);
-    pMatrix = math.multiply(fMatrix, coefs);
-    yVals = pMatrix.transpose()._data[0];
-
-    fitData = math.matrix([xVals, yVals]).transpose()._data;
+    var xStep = (xMax - xMin) / 50
+    var xVals = math.range(xMin, xMax + xStep, xStep)._data
+    var fMatrix = nlFeatures(xVals);
+    var pMatrix = math.multiply(fMatrix, coefs);
+    var yVals = pMatrix.transpose()._data[0];
+    var fitData = math.matrix([xVals, yVals]).transpose()._data;
 
     plot = $.plot("#theGraph",
       [
@@ -67,18 +80,18 @@
 
   $(document).ready( function() {
     xyData = []
-    var N = 5
-    for (var ii = 0; ii <= N; ii++) {
-      x = Math.random();
-      y = 0.3*x + Math.random() * 0.5;
-      xyData.push([x,y])
-    }
+    // var N = 5
+    // for (var ii = 0; ii <= N; ii++) {
+    //   x = Math.random();
+    //   y = 0.3*x + Math.random() * 0.5;
+    //   xyData.push([x,y])
+    // }
     plotIt(xyData);
 
     $("#theGraph").bind("plotclick", function(event, pos, item){
       x = pos.x; y = pos.y;
       xyData.push([pos.x, pos.y]);
-      while (xyData.length > 10) {xyData.shift()}
+      while (xyData.length > Number($("#var_maxN").val())) {xyData.shift()}
       plotIt(xyData);
       updateFit(xyData);
     });
