@@ -34,7 +34,10 @@
   }
 
   function plotFit(coefs) {
-    xVals = [plot.getAxes().xaxis.min, xMax = plot.getAxes().xaxis.max];
+    var xMin = plot.getAxes().xaxis.min;
+    var xMax = plot.getAxes().xaxis.max;
+    xStep = (xMax - xMin) / 50
+    xVals = math.range(xMin, xMax + xStep, xStep)._data
     fMatrix = nlFeatures(xVals);
     pMatrix = math.multiply(fMatrix, coefs);
     yVals = pMatrix.transpose()._data[0];

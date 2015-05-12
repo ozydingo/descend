@@ -11,7 +11,7 @@ function llmse(data, truth) {
 
 // take array xx and produce matrix with powers of x in cols
 function nlFeatures(xx, powers) {
-	if (typeof(powers) == 'undefined') powers = [0,1];
+	if (typeof(powers) == 'undefined') powers = [0,1,2];
 	mm = xx.length;
 	pp = powers.map(function(e) {
 		return (e==0 ? math.ones(mm)._data : math.dotPow(xx,e))
