@@ -4,8 +4,8 @@ function llmse(data, truth) {
     	throw "training data size mismatch";
     }
     s = math.inv(math.multiply(data.transpose(), data));
-    r = math.multiply(s, data.transpse());
-    p = math.multpliy(r, truth);
+    r = math.multiply(s, data.transpose());
+    p = math.multiply(r, truth);
     return p;
 }
 
