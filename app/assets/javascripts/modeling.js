@@ -6,12 +6,11 @@ modeling = function() {
 		if (data.size()[0] != truth.size()[0]) throw "training data size mismatch";
 
 		s = math.multiply(data.transpose(), data);
-		if (math.det(s) < 1e-10) {
-			return math.multiply(math.ones(data.size()[1], 1), NaN)
-		}
+		if (math.det(s) < 1e-10) return math.multiply(math.ones(data.size()[1], 1), NaN)
 		si = math.inv(s);
 		r = math.multiply(si, data.transpose());
 		p = math.multiply(r, truth);
+
 		return p;
 	}
 
