@@ -10,8 +10,10 @@
 
 :javascript
 
+  //TODO: get rid of globals
   var thePlot, xyData = [], fitData = {}
 
+  // generate callback for "the data has changed"
   function updateData() {
     xyData = pruneData(xyData);
     fitData.llmse = computeFit(xyData);
@@ -23,6 +25,7 @@
     updateData();
   }
 
+  // general function to plot data and any fit lines
   function plotIt(xyData, fits) {
     var coefs
     if (fits === undefined) fits = {};
