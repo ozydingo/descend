@@ -80,7 +80,7 @@
     var xMax = thePlot.getAxes().xaxis.max;
     var xStep = (xMax - xMin) / 50;
     var xVals = math.range(xMin, xMax + xStep, xStep)._data;
-    var fMatrix = nlFeatures(xVals);
+    var fMatrix = modeling.nlFeatures(xVals);
     var pMatrix = math.multiply(fMatrix, coefs);
     var yVals = pMatrix.transpose()._data[0];
     var fitData = math.matrix([xVals, yVals]).transpose()._data;
@@ -92,9 +92,9 @@
     if (xyData.length == 0) return null;
     xPoints = xyData.map(function(xy){return xy[0]});
     yPoints = xyData.map(function(xy){return xy[1]});
-    xData = nlFeatures(xPoints);
+    xData = modeling.nlFeatures(xPoints);
     yData = math.matrix([yPoints]).transpose();
-    coefs = llmse(xData, yData);
+    coefs = modeling.llmse(xData, yData);
     return coefs;    
   }
 
