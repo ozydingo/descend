@@ -1,43 +1,45 @@
 modeling = function() {
 
-	// take matrix data, truth, produce matrix of linear model parameter estimates
-	function llmse(data, truth) {
-		if (data.size()[0] == 0 || data.size()[1] == 0) return math.matrix()
-		if (data.size()[0] != truth.size()[0]) throw "training data size mismatch";
+	// take matrix features, putcome, produce matrix of linear model parameter estimates
+	function llmse(features, putcome) {
+		if (features.size()[0] == 0 || features.size()[1] == 0) return math.matrix()
+		if (features.size()[0] != putcome.size()[0]) throw "training data size mismatch";
 
-		s = math.multiply(data.transpose(), data);
-		if (math.det(s) < 1e-10) return math.multiply(math.ones(data.size()[1], 1), NaN)
+		s = math.multiply(features.transpose(), features);
+		if (math.det(s) < 1e-10) return math.multiply(math.ones(features.size()[1], 1), NaN)
 		si = math.inv(s);
-		r = math.multiply(si, data.transpose());
-		p = math.multiply(r, truth);
+		r = math.multiply(si, features.transpose());
+		p = math.multiply(r, putcome);
 
 		return p;
 	}
 
 	descend = function() {
-		var coefs, data, truth
+		var coefs, alpha = 0.1;
 
-		function step() {
+		function step(features,putcome,n) {
+			var newCoefs;
+			if (n === undefined) n==1;
+			if (coefs === undefined) coefs = math.zeros(x.size()[1],1)
+
+			newCoefs = coefs.slice(0)
+			for (ii=0; ii<n; i++) {
+				var e = math.subtract(math.multiply(features.transpose(), coefs), putcome.transpose());
+				var d = math.multiply(math.multiply(1/features.size()[1], features), e);
+				newCoefs = math.subtract(coefs, math.multiply(alpha, d))
+				coefs = newCoefs
+			};
 			return coefs;
 		}
 
-		function init(data, truth) {
-			//TODO: don't cheat
-			updateData(data, truth);
-			coefs = llmse(data, truth);
+		function init() {
+			coefs = undefined;
 		}
-
-		function updateData(newData, newTruth) {
-			data = newData;
-			truth = newTruth;
-		}
-
-		init(math.matrix(), math.matrix());
 
 		return {
 			init: init,
-			updateData: updateData,
-			step: step
+			step: step,
+			coefs: coefs
 		}
 	}();
 

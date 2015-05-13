@@ -17,7 +17,7 @@
   function updateData() {
     xyData = pruneData(xyData);
     fitData.llmse = computeFit(xyData);
-    plotIt(xyData, {llmse: fitData.llmse});
+    plotIt(xyData, {llmse: fitData.llmse, descent: fitData.descent});
   }
 
   function clearData() {
@@ -27,7 +27,7 @@
 
   // general function to plot data and any fit lines
   function plotIt(xyData, fits) {
-    var coefs
+    var coefs, fitData
     if (fits === undefined) fits = {};
 
     // define first plot data: the data points themselves
@@ -60,7 +60,7 @@
       series.push({
         data: fitData,
         lines: {show: true},
-        color: "yellow"
+        color: "orange"
       });
     }
 
@@ -87,14 +87,18 @@
     return fitData;
   }
 
+  function matrixData(xyData) {
+    var xPoints = xyData.map(function(xy){return xy[0]});
+    var yPoints = xyData.map(function(xy){return xy[1]});
+    var xData = modeling.nlFeatures(xPoints);
+    var yData = yPoints.length == 0 ? math.matrix() : math.matrix([yPoints]).transpose();
+    return {features: xData, outcome: yData}
+  }
+
   // compute fit coeffs for llmse given data
   function computeFit(xyData) {
-    if (xyData.length == 0) return null;
-    xPoints = xyData.map(function(xy){return xy[0]});
-    yPoints = xyData.map(function(xy){return xy[1]});
-    xData = modeling.nlFeatures(xPoints);
-    yData = math.matrix([yPoints]).transpose();
-    coefs = modeling.llmse(xData, yData);
+    var data = matrixData(xyData);
+    coefs = modeling.llmse(data.features, data.outcome);
     return coefs;    
   }
 
