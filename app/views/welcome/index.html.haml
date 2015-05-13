@@ -17,7 +17,13 @@
   function updateData() {
     xyData = pruneData(xyData);
     fitData.llmse = computeFit(xyData);
-    plotIt(xyData, {llmse: fitData.llmse, descent: fitData.descent});
+    plotIt(xyData, fitData);
+  }
+
+  function descend(n) {
+    data = matrixData(xyData);
+    fitData.descent = modeling.descend.step(data.features, data.outcome, n);
+    plotIt(xyData, fitData);
   }
 
   function clearData() {
@@ -98,7 +104,7 @@
   // compute fit coeffs for llmse given data
   function computeFit(xyData) {
     var data = matrixData(xyData);
-    coefs = modeling.llmse(data.features, data.outcome);
+    var coefs = modeling.llmse(data.features, data.outcome);
     return coefs;    
   }
 

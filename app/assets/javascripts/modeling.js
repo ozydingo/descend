@@ -1,33 +1,34 @@
 modeling = function() {
 
-	// take matrix features, putcome, produce matrix of linear model parameter estimates
-	function llmse(features, putcome) {
+	// take matrix features, outcome, produce matrix of linear model parameter estimates
+	function llmse(features, outcome) {
 		if (features.size()[0] == 0 || features.size()[1] == 0) return math.matrix()
-		if (features.size()[0] != putcome.size()[0]) throw "training data size mismatch";
+		if (features.size()[0] != outcome.size()[0]) throw "training data size mismatch";
 
 		s = math.multiply(features.transpose(), features);
 		if (math.det(s) < 1e-10) return math.multiply(math.ones(features.size()[1], 1), NaN)
 		si = math.inv(s);
 		r = math.multiply(si, features.transpose());
-		p = math.multiply(r, putcome);
+		p = math.multiply(r, outcome);
 
 		return p;
 	}
 
 	descend = function() {
-		var coefs, alpha = 0.1;
+		var coefs, alpha = 0.01;
 
-		function step(features,putcome,n) {
+		function step(features, outcome, n) {
 			var newCoefs;
-			if (n === undefined) n==1;
-			if (coefs === undefined) coefs = math.zeros(x.size()[1],1)
+			if (n === undefined) n=1;
+			if (coefs === undefined) coefs = math.zeros(features.size()[1],1);
 
-			newCoefs = coefs.slice(0)
-			for (ii=0; ii<n; i++) {
-				var e = math.subtract(math.multiply(features.transpose(), coefs), putcome.transpose());
-				var d = math.multiply(math.multiply(1/features.size()[1], features), e);
+			newCoefs = coefs.clone()
+			for (ii=0; ii<n; ii++) {
+				var e = math.subtract(math.multiply(features, coefs), outcome);
+				var m = features.size()[1];
+				var d = math.multiply(1/m, math.multiply(features.transpose(), e));
 				newCoefs = math.subtract(coefs, math.multiply(alpha, d))
-				coefs = newCoefs
+				coefs = newCoefs.clone()
 			};
 			return coefs;
 		}
