@@ -5,38 +5,86 @@
 %div{id: "theGraph", style: "width:600px;height:300px" }
 %p{id: "btn_clear"}= link_to("Clear", "#")
 
+
+
+
 :javascript
-  $("#btn_clear").click(clearData);
+
+  var thePlot, xyData = [], fitData = {}
+
+  function updateData() {
+    xyData = pruneData(xyData);
+    fitData.llmse = computeFit(xyData);
+    plotIt(xyData, {llmse: fitData.llmse});
+  }
+
   function clearData() {
     xyData = [];
-    updateFit(xyData);
+    updateData();
   }
 
-  var plot = null;
+  function plotIt(xyData, fits) {
+    var coefs
+    if (fits === undefined) fits = {};
 
-  function plotIt(xyData) {
-    plot = $.plot("#theGraph",
-      [{
-        data: xyData,
-        points: {show: true}
-      }],
-      {
-        grid: {clickable: true},
-        xaxis: {min: 0, max: 1},
-        yaxis: {min: 0, max: 1}
-      }
-    );      
-  }
+    // define first plot data: the data points themselves
+    var series = [{
+      data: xyData,
+      points: {show: true},
+      color: "blue"
+    }];
 
-  function updateFit(xyData) {
-    if (xyData.length > 0) {
-      coefs = computeFit(xyData);
-      plotFit(coefs);
-    } else {
-      plotIt([]);
+    // plot options
+    var options = {
+      grid: {clickable: true},
+      xaxis: {min: 0, max: 1},
+      yaxis: {min: 0, max: 1}
+    };
+
+    // add fit line if specified
+    if (fits.llmse) {
+      fitData = getFitPlotData(fits.llmse);
+      series.push({
+        data: fitData,
+        lines: {show: true},
+        color: "red"
+      });
     }
+
+    // add descent fit line if specified
+    if (fits.descent) {
+      fitData = getFitPlotData(fits.descent);
+      series.push({
+        data: fitData,
+        lines: {show: true},
+        color: "yellow"
+      });
+    }
+
+    thePlot = $.plot("#theGraph", series, options);
+    return thePlot;
   }
 
+  // limit to manN data points
+  function pruneData(xyData) {
+    while (xyData.length > Number($("#var_maxN").val())) {xyData.shift()};
+    return xyData
+  }
+
+  // return x,y data for llmse fit
+  function getFitPlotData(coefs) {
+    var xMin = thePlot.getAxes().xaxis.min;
+    var xMax = thePlot.getAxes().xaxis.max;
+    var xStep = (xMax - xMin) / 50;
+    var xVals = math.range(xMin, xMax + xStep, xStep)._data;
+    var fMatrix = nlFeatures(xVals);
+    var pMatrix = math.multiply(fMatrix, coefs);
+    var yVals = pMatrix.transpose()._data[0];
+    var fitData = math.matrix([xVals, yVals]).transpose()._data;
+    return fitData;
+  }
+
+  // compute fit coeffs for llmse given data
   function computeFit(xyData) {
     if (xyData.length == 0) return null;
     xPoints = xyData.map(function(xy){return xy[0]});
@@ -47,53 +95,15 @@
     return coefs;    
   }
 
-  function plotFit(coefs) {
-    var xMin = plot.getAxes().xaxis.min;
-    var xMax = plot.getAxes().xaxis.max;
-    var xStep = (xMax - xMin) / 50
-    var xVals = math.range(xMin, xMax + xStep, xStep)._data
-    var fMatrix = nlFeatures(xVals);
-    var pMatrix = math.multiply(fMatrix, coefs);
-    var yVals = pMatrix.transpose()._data[0];
-    var fitData = math.matrix([xVals, yVals]).transpose()._data;
-
-    plot = $.plot("#theGraph",
-      [
-        {
-          data: xyData,
-          points: {show: true},
-        },
-        {
-          data: fitData,
-          lines: {show: true},
-          color: "red"
-        }
-      ],
-      {
-        grid: {clickable: true},
-        xaxis: {min: 0, max: 1},
-        yaxis: {min: 0, max: 1}
-      }
-    );
-
-  }
-
   $(document).ready( function() {
-    xyData = []
-    // var N = 5
-    // for (var ii = 0; ii <= N; ii++) {
-    //   x = Math.random();
-    //   y = 0.3*x + Math.random() * 0.5;
-    //   xyData.push([x,y])
-    // }
-    plotIt(xyData);
+    $("#btn_clear").click(clearData);
+    $("#var_maxN").change(updateData);
+
+    thePlot = plotIt([]);
 
     $("#theGraph").bind("plotclick", function(event, pos, item){
-      x = pos.x; y = pos.y;
       xyData.push([pos.x, pos.y]);
-      while (xyData.length > Number($("#var_maxN").val())) {xyData.shift()}
-      plotIt(xyData);
-      updateFit(xyData);
+      updateData();
     });
 
   } );
