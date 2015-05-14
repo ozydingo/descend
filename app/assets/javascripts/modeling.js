@@ -15,7 +15,7 @@ modeling = function() {
 	}
 
 	descend = function() {
-		var coefs, alpha = 0.01;
+		var coefs, alpha = 0.05;
 
 		function step(features, outcome, n) {
 			var newCoefs;

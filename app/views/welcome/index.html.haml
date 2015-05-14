@@ -3,7 +3,10 @@
 %span Max data points:&nbsp;
 %input{id: "var_maxN", type: "text", value: "25"}
 %div{id: "theGraph", style: "width:600px;height:300px" }
-%p{id: "btn_clear"}= link_to("Clear", "#")
+%div{id: "buttons"}
+  %span{id: "btn_clear"}= link_to("Clear", "#")
+  |
+  %span{id: "btn_descend", value: "off"}= link_to("Descend", "#")
 
 
 
@@ -12,6 +15,19 @@
 
   //TODO: get rid of globals
   var thePlot, xyData = [], fitData = {}
+
+  function toggleDescent() {
+    var descent = $("#btn_descend").attr("value");
+    if (descent === "off") {
+      descent = setInterval(descend, 20);
+      $("#btn_descend").text("Stop");
+    } else {
+      clearInterval(descent);
+      descent = "off";
+      $("#btn_descend").text("Descend");
+    }
+    $("#btn_descend").attr("value", descent);
+  }
 
   // generate callback for "the data has changed"
   function updateData() {
@@ -110,6 +126,7 @@
 
   $(document).ready( function() {
     $("#btn_clear").click(clearData);
+    $("#btn_descend").click(toggleDescent);
     $("#var_maxN").change(updateData);
 
     thePlot = plotIt([]);
