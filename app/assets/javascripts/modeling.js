@@ -21,6 +21,7 @@ modeling = function() {
 			var newCoefs;
 			if (n === undefined) n=1;
 			if (coefs === undefined) coefs = math.zeros(features.size()[1],1);
+			if (features.size()[0] == 0) return coefs;
 
 			newCoefs = coefs.clone()
 			for (ii=0; ii<n; ii++) {
