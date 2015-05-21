@@ -15,4 +15,3 @@
 //= require jquery.flot
 //= require jquery.flot.pie
 //= require math
-//= require_tree .

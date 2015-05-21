@@ -14,7 +14,7 @@ modeling = function() {
 		return p;
 	}
 
-	descend = function() {
+	var descend = function() {
 		var coefs, alpha = 0.05;
 
 		function step(features, outcome, n) {
@@ -47,7 +47,7 @@ modeling = function() {
 
 	// take array xx and produce matrix with powers of x in cols
 	function nlFeatures(xx, powers) {
-		if (powers === undefined) powers = [0,1,2];
+		if (powers === undefined) powers = [0,1,2,3];
 		if (xx.length == 0) return math.ones(0,powers.length)
 		mm = xx.length;
 		pp = powers.map(function(e) {
