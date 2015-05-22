@@ -37,42 +37,42 @@ function clearData() {
 function plotIt(xyData, fits) {
 	var coefs, fitData
 	if (fits === undefined) fits = {};
-
-// define first plot data: the data points themselves
-var series = [{
-	data: xyData,
-	points: {show: true},
-	color: "blue"
-}];
-
-// plot options
-var options = {
-	grid: {clickable: true},
-	xaxis: {min: 0, max: 1},
-	yaxis: {min: 0, max: 1}
-};
-
-// add fit line if specified
-if (fits.llmse) {
-	fitData = getFitPlotData(fits.llmse);
-	series.push({
-		data: fitData,
-		lines: {show: true},
-		color: "red"
-	});
-}
-
-// add descent fit line if specified
-if (fits.descent) {
-	fitData = getFitPlotData(fits.descent);
-	series.push({
-		data: fitData,
-		lines: {show: true},
-		color: "orange"
-	});
-}
-
-thePlot = $.plot("#theGraph", series, options);
+	
+	// define first plot data: the data points themselves
+	var series = [{
+		data: xyData,
+		points: {show: true},
+		color: "blue"
+	}];
+	
+	// plot options
+	var options = {
+		grid: {clickable: true},
+		xaxis: {min: 0, max: 1},
+		yaxis: {min: 0, max: 1}
+	};
+	
+	// add fit line if specified
+	if (fits.llmse) {
+		fitData = getFitPlotData(fits.llmse);
+		series.push({
+			data: fitData,
+			lines: {show: true},
+			color: "red"
+		});
+	}
+	
+	// add descent fit line if specified
+	if (fits.descent) {
+		fitData = getFitPlotData(fits.descent);
+		series.push({
+			data: fitData,
+			lines: {show: true},
+			color: "orange"
+		});
+	}
+	
+	thePlot = $.plot("#theGraph", series, options);
 	return thePlot;
 }
 
