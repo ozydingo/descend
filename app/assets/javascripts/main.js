@@ -1,5 +1,6 @@
 //TODO: get rid of globals
 var thePlot, xyData = [], fitData = {}
+var descent;
 
 function toggleDescent() {
 	var descent = $("#btn_descend").attr("value");
@@ -23,7 +24,7 @@ function updateData() {
 
 function descend(n) {
 	data = matrixData(xyData);
-	fitData.descent = modeling.descend.step(data.features, data.outcome, n);
+	fitData.descent = descent.step(data.features, data.outcome, n);
 	plotIt(xyData, fitData);
 }
 
@@ -72,7 +73,7 @@ if (fits.descent) {
 }
 
 thePlot = $.plot("#theGraph", series, options);
-return thePlot;
+	return thePlot;
 }
 
 // limit to manN data points
@@ -115,6 +116,8 @@ $(document).ready( function() {
 	$("#var_maxN").change(updateData);
 
 	thePlot = plotIt([]);
+	descent = modeling.descend();
+
 
 	$("#theGraph").bind("plotclick", function(event, pos, item){
 		xyData.push([pos.x, pos.y]);

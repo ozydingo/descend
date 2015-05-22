@@ -43,7 +43,7 @@ modeling = function() {
 			step: step,
 			coefs: coefs
 		}
-	}();
+	};
 
 	// take array xx and produce matrix with powers of x in cols
 	function nlFeatures(xx, powers) {
