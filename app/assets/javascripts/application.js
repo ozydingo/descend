@@ -15,3 +15,4 @@
 //= require jquery.flot
 //= require jquery.flot.pie
 //= require math
+//= require vis
