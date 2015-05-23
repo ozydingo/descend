@@ -5,14 +5,17 @@
 %h1 Descend
 
 %span Max data points:&nbsp;
-%input{id: "var_maxN", type: "text", value: "25"}
-%div{id: "theGraph", style: "width:600px;height:300px" }
-%div{id: "buttons"}
-  %span{id: "btn_clear"}= link_to("Clear", "#")
+%input#var_maxN{type: "text", value: "25"}
+#theGraph{style: "width:600px;height:300px" }
+#buttons
+  %span.button#btn_clear Clear
   |
-  %span{id: "btn_descend", value: "off"}= link_to("Descend", "#")
-%div{id: "hud", style: "width:600px;height:300px"}
-  %div{id: "costPlot0", style: "width:200px;height:200px;background-color:black"}
+  %span.button#btn_descend{value: "off"} Descend  
+%div#hud{style: "width:600px;height:300px"}
+  %div#costPlot0{style: "width:200px;height:200px;background-color:black"}
+
+:css
+  .button{cursor: pointer}
 
 :javascript
   var hud0 = function(){
