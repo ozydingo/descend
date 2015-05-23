@@ -2,7 +2,7 @@ modeling = function() {
 
 	// take matrix features, outcome, produce matrix of linear model parameter estimates
 	function llmse(features, outcome) {
-		if (features.size()[0] == 0 || features.size()[1] == 0) return math.matrix()
+		if (features.size()[0] == 0 || features.size()[1] == 0) return math.matrix().resize([features.size()[1], 0])
 		if (features.size()[0] != outcome.size()[0]) throw "training data size mismatch";
 
 		s = math.multiply(features.transpose(), features);

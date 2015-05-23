@@ -37,21 +37,21 @@ function clearData() {
 function plotIt(xyData, fits) {
 	var coefs, fitData
 	if (fits === undefined) fits = {};
-	
+
 	// define first plot data: the data points themselves
 	var series = [{
 		data: xyData,
 		points: {show: true},
 		color: "blue"
 	}];
-	
+
 	// plot options
 	var options = {
 		grid: {clickable: true},
 		xaxis: {min: 0, max: 1},
 		yaxis: {min: 0, max: 1}
 	};
-	
+
 	// add fit line if specified
 	if (fits.llmse) {
 		fitData = getFitPlotData(fits.llmse);
@@ -61,7 +61,7 @@ function plotIt(xyData, fits) {
 			color: "red"
 		});
 	}
-	
+
 	// add descent fit line if specified
 	if (fits.descent) {
 		fitData = getFitPlotData(fits.descent);
@@ -71,7 +71,7 @@ function plotIt(xyData, fits) {
 			color: "orange"
 		});
 	}
-	
+
 	thePlot = $.plot("#theGraph", series, options);
 	return thePlot;
 }
@@ -84,6 +84,7 @@ function pruneData(xyData) {
 
 // return x,y data for llmse fit
 function getFitPlotData(coefs) {
+	if (coefs.size()[1]==0) return []
 	var xMin = thePlot.getAxes().xaxis.min;
 	var xMax = thePlot.getAxes().xaxis.max;
 	var xStep = (xMax - xMin) / 50;
