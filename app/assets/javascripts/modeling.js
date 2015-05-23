@@ -14,7 +14,8 @@ modeling = function() {
 		return p;
 	}
 
-	var descend = function() {
+	// create new instance of descend model
+	function descend() {
 		var coefs, alpha = 0.05;
 
 		function step(features, outcome, n) {
@@ -38,10 +39,12 @@ modeling = function() {
 			coefs = undefined;
 		}
 
+		function getCoefs() {return coefs}
+
 		return {
 			init: init,
 			step: step,
-			coefs: coefs
+			getCoefs: getCoefs
 		}
 	};
 
