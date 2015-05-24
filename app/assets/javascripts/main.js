@@ -18,13 +18,13 @@ function toggleDescent() {
 // generate callback for "the data has changed"
 function updateData() {
 	xyData = pruneData(xyData);
-	llmseFit = modeling.xy.xyllmse(xyData, xPowers);
+	llmseFit = xyHelper.llmse(xyData, xPowers);
 	plotIt();
 }
 
 // run n iterations given current data
 function descend(n) {
-	data = modeling.xy.trainingData(xyData);
+	data = xyHelper.trainingData(xyData);
 	descent.step(data.features, data.outcomes, n);
 	plotIt();
 }
@@ -86,7 +86,7 @@ function getFitPlotData(coefs) {
 	if (!coefs || coefs.size()[1]==0) return [];
 	var xMin = thePlot.getAxes().xaxis.min;
 	var xMax = thePlot.getAxes().xaxis.max;
-	return modeling.xy.getFitLine(coefs, xPowers, xMin, xMax, 50)
+	return xyHelper.getFitLine(coefs, xPowers, xMin, xMax, 50)
 }
 
 $(document).ready( function() {
