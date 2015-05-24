@@ -1,24 +1,24 @@
 //TODO: get rid of globals?
-var xyData, xyFit, xPowers = [0,1];
+var xyData, llmseFit, xPowers = [0,1];
 var thePlot, descent;
 
 function toggleDescent() {
-	var descent = $("#btn_descend").attr("value");
-	if (descent === "off") {
-		descent = setInterval(descend, 20);
+	var descentEnabled = $("#btn_descend").attr("value");
+	if (descentEnabled === "off") {
+		descentEnabled = setInterval(descend, 20);
 		$("#btn_descend").text("Stop");
 	} else {
-		clearInterval(descent);
-		descent = "off";
+		clearInterval(descentEnabled);
+		descentEnabled = "off";
 		$("#btn_descend").text("Descend");
 	}
-	$("#btn_descend").attr("value", descent);
+	$("#btn_descend").attr("value", descentEnabled);
 }
 
 // generate callback for "the data has changed"
 function updateData() {
 	xyData = pruneData(xyData);
-	xyFit = modeling.xy.xyllmse(xyData, xPowers);
+	llmseFit = modeling.xy.xyllmse(xyData, xPowers);
 	plotIt();
 }
 
@@ -36,13 +36,6 @@ function clearData() {
 
 // general function to plot data and any fit lines
 function plotIt() {
-	// define first plot data: the data points themselves
-	var series = [{
-		data: xyData,
-		points: {show: true},
-		color: "blue"
-	}];
-
 	// plot options
 	var options = {
 		grid: {clickable: true},
@@ -50,9 +43,16 @@ function plotIt() {
 		yaxis: {min: 0, max: 1}
 	};
 
-	// add fit line if it exists
-	if (xyFit) {
-		var fitData = getFitPlotData(xyFit);
+	// Add data points to plot data
+	var series = [{
+		data: xyData,
+		points: {show: true},
+		color: "blue"
+	}];
+
+	// add llmse fit line if it exists
+	if (llmseFit) {
+		var fitData = getFitPlotData(llmseFit);
 		series.push({
 			data: fitData,
 			lines: {show: true},
