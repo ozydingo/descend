@@ -95,6 +95,12 @@ modeling = function() {
 			return math.range(min, max + step, step)._data;
 		}
 
+		function getFitLine(coefs, powers, min, max, num) {
+			var xVals = xSupport(min, max, num);
+			var yVals = predict(coefs, xVals, powers);
+			return zipXY(xVals, yVals);
+		}
+
 		function xySupport() {
 
 		}
@@ -129,6 +135,7 @@ modeling = function() {
 			predict: predict,
 			xyllmse: xyllmse,
 			xSupport: xSupport,
+			getFitLine: getFitLine,
 			xySupport: xySupport,
 			zipXY: zipXY,
 			unzipXY: unzipXY

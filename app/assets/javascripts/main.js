@@ -86,10 +86,7 @@ function getFitPlotData(coefs) {
 	if (!coefs || coefs.size()[1]==0) return [];
 	var xMin = thePlot.getAxes().xaxis.min;
 	var xMax = thePlot.getAxes().xaxis.max;
-	var xVals = modeling.xy.xSupport(xMin, xMax, 50);
-	var yVals = modeling.xy.predict(coefs, xVals, xPowers);
-	var fitData = modeling.xy.zipXY(xVals, yVals)
-	return fitData;
+	return modeling.xy.getFitLine(coefs, xPowers, xMin, xMax, 50)
 }
 
 $(document).ready( function() {
