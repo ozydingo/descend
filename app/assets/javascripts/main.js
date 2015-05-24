@@ -18,10 +18,11 @@ function toggleDescent() {
 // generate callback for "the data has changed"
 function updateData() {
 	xyData = pruneData(xyData);
-	xyFit = computeFit(xyData);
+	xyFit = modeling.xy.xyllmse(xyData, xPowers);
 	plotIt();
 }
 
+// run n iterations given current data
 function descend(n) {
 	data = modeling.xy.trainingData(xyData);
 	descent.step(data.features, data.outcomes, n);
@@ -49,7 +50,7 @@ function plotIt() {
 		yaxis: {min: 0, max: 1}
 	};
 
-	// add fit line if specified
+	// add fit line if it exists
 	if (xyFit) {
 		var fitData = getFitPlotData(xyFit);
 		series.push({
@@ -59,7 +60,8 @@ function plotIt() {
 		});
 	}
 
-	// add descent fit line if specified
+	// add descent fit line if it exists
+	var dFit;
 	if (dFit = descent.getCoefs()) {
 		var fitData = getFitPlotData(dFit);
 		series.push({
@@ -81,21 +83,13 @@ function pruneData(xyData) {
 
 // return x,y data for llmse fit
 function getFitPlotData(coefs) {
-	if (!coefs || coefs.size()[1]==0) return []
+	if (!coefs || coefs.size()[1]==0) return [];
 	var xMin = thePlot.getAxes().xaxis.min;
 	var xMax = thePlot.getAxes().xaxis.max;
-	var xStep = (xMax - xMin) / 50;
-	var xVals = math.range(xMin, xMax + xStep, xStep)._data;
+	var xVals = modeling.xy.xSupport(xMin, xMax, 50);
 	var yVals = modeling.xy.predict(coefs, xVals, xPowers);
 	var fitData = modeling.xy.zipXY(xVals, yVals)
 	return fitData;
-}
-
-// compute fit coeffs for llmse given data
-function computeFit(xyData) {
-	var data = modeling.xy.trainingData(xyData)
-	var coefs = modeling.llmse(data.features, data.outcomes);
-	return coefs;    
 }
 
 $(document).ready( function() {

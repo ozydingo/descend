@@ -74,16 +74,29 @@ modeling = function() {
 		}
 
 		// return features and outcomes from zipped xy Arrays
-		function trainingData(zippedXY) {
+		function trainingData(zippedXY, powers) {
 			var unzippedXY = unzipXY(zippedXY);
-			var f = features(unzippedXY.x);
+			var f = features(unzippedXY.x, powers);
 			var o = outcomes(unzippedXY.y);
 			return {features: f, outcomes: o}
 		}
 
+		// compute linear fit to xyData including powers
+		function xyllmse(xyData, powers) {
+			data = trainingData(xyData, powers);
+			return llmse(data.features, data.outcomes);
+		}
+
 		// generate matrix of support values for given dimensions
-		function basis() {
-			throw "basis() is NIY"
+		function xSupport(min, max, num) {
+			if (num===undefined) num=50;
+			if (min >= max) throw "Cannot compute support vector for (" + min + ", " + max + ")";
+			step = (max - min) / num;
+			return math.range(min, max + step, step)._data;
+		}
+
+		function xySupport() {
+
 		}
 
 		// predict y (Array) from x (Array) given coefs (Matrix) and powers (Array)
@@ -114,7 +127,9 @@ modeling = function() {
 			outcomes: outcomes,
 			trainingData: trainingData,
 			predict: predict,
-			basis: basis,
+			xyllmse: xyllmse,
+			xSupport: xSupport,
+			xySupport: xySupport,
 			zipXY: zipXY,
 			unzipXY: unzipXY
 		}
