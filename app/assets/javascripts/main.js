@@ -20,6 +20,7 @@ function updateData() {
 	xyData = pruneData(xyData);
 	llmseFit = xyHelper.llmse(xyData, xPowers);
 	plotIt();
+	plotCost();
 }
 
 // run n iterations given current data
@@ -73,6 +74,48 @@ function plotIt() {
 
 	thePlot = $.plot("#theGraph", series, options);
 	return thePlot;
+}
+
+function plotCost() {
+	if (xyData.length==0) return;
+	var data = new vis.DataSet();
+
+	var d = xyHelper.trainingData(xyData);
+	var coefArrays = [math.range(0,1,0.1).toArray(), math.range(-1,1,0.1).toArray()];
+	var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, coefArrays)
+	var counter = 0;
+	console.dir(costMatrix);
+	math.forEach(costMatrix, function(c,ii) {
+		data.add({
+			id: counter++,
+			x:coefArrays[0][ii[0]],
+			y:coefArrays[1][ii[1]],
+			z:c,
+			style:c
+		});
+	});
+
+	var container = $("#costPlot0")
+
+	// specify options
+	var options = {
+		xLabel: "x[0]",
+		yLabel: "x[1]",
+		xStep: 0.5,
+		yStep: 0.5,
+		xStep: 0.5,
+		width: container.width(),
+		height: container.height(),
+		style: 'surface',
+		showPerspective: true,
+		showGrid: true,
+		showShadow: false,
+		keepAspectRatio: true,
+		verticalRatio: 0.5
+	};
+
+	// Instantiate our graph object.
+	var graph3d = new vis.Graph3d(container[0], data, options);
 }
 
 // limit to manN data points
