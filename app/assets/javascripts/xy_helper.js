@@ -51,10 +51,6 @@ var xyHelper = function() {
 		return zipXY(xVals, yVals);
 	}
 
-	function xySupport() {
-
-	}
-
 	// predict y (Array) from x (Array) given coefs (Matrix) and powers (Array)
 	function predict(coefs, xArray, powers) {
 		if (powers===undefined) powers=[0,1];
@@ -86,7 +82,6 @@ var xyHelper = function() {
 		llmse: llmse,
 		xSupport: xSupport,
 		getFitLine: getFitLine,
-		xySupport: xySupport,
 		zipXY: zipXY,
 		unzipXY: unzipXY
 	}

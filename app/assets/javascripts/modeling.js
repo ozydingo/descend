@@ -48,6 +48,12 @@ modeling = function() {
 		}
 	};
 
+	function cost(features, outcome, coefs) {
+		var predictions = math.multiply(features, coefs);
+		err = math.subtract(outcome, predictions)
+		return math.sum(math.dotPow(err,2))
+	}
+
 	return {
 		llmse: llmse,
 		descent: descent, 
