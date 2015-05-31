@@ -33,8 +33,14 @@ var xyHelper = function() {
 
 	// compute linear fit to xyData including powers
 	function llmse(xyData, powers) {
-		data = trainingData(xyData, powers);
+		var data = trainingData(xyData, powers);
 		return modeling.llmse(data.features, data.outcomes);
+	}
+
+	// compute cost function for data and coefs
+	function computeCost(xyData, powers, coefs) {
+		var data = trainingData(xyData, powers);
+		return modeling.computeCost(data.features, data.outcomes, coefs)
 	}
 
 	// generate matrix of support values for given dimensions
@@ -80,6 +86,7 @@ var xyHelper = function() {
 		trainingData: trainingData,
 		predict: predict,
 		llmse: llmse,
+		computeCost: computeCost,
 		xSupport: xSupport,
 		getFitLine: getFitLine,
 		zipXY: zipXY,
