@@ -1,6 +1,6 @@
 //TODO: get rid of globals?
 var xyData, llmseFit, xPowers = [0,1];
-var thePlot, descent;
+var thePlot, descent, huds;
 
 function toggleDescent() {
 	var descentEnabled = $("#btn_descend").attr("value");
@@ -115,7 +115,7 @@ function plotCost() {
 	};
 
 	// Instantiate our graph object.
-	var graph3d = new vis.Graph3d(container[0], data, options);
+	huds = new vis.Graph3d(container[0], data, options);
 }
 
 // limit to manN data points
@@ -139,7 +139,6 @@ $(document).ready( function() {
 
 	descent = modeling.descent();
 	clearData();
-	thePlot = plotIt();
 
 	$("#theGraph").bind("plotclick", function(event, pos, item){
 		xyData.push([pos.x, pos.y]);
