@@ -109,14 +109,16 @@ function plotCost() {
 		xStep: 0.5,
 		yStep: 0.5,
 		xStep: 0.5,
-		width: container.width(),
-		height: container.height(),
+		yCenter: "35%",
+		width: container.width() + "px",
+		height: container.height() + "px",
 		style: 'surface',
 		showPerspective: true,
 		showGrid: true,
 		showShadow: false,
 		keepAspectRatio: true,
-		verticalRatio: 0.5
+		verticalRatio: 0.7,
+		cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 1.7}
 	};
 
 	// Instantiate our graph object.
