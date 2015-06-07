@@ -28,6 +28,7 @@ function descend(n) {
 	data = xyHelper.trainingData(xyData);
 	descent.step(data.features, data.outcomes, n);
 	plotIt();
+	plotCost();
 }
 
 function clearData() {
@@ -78,18 +79,22 @@ function plotIt() {
 
 function plotCost() {
 	if (xyData.length==0) return;
-	var data = new vis.DataSet();
 
 	var d = xyHelper.trainingData(xyData);
-	var coefArrays = [math.range(0,1,0.1).toArray(), math.range(-1,1,0.1).toArray()];
-	var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, coefArrays)
+	var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
+	var plotIndices = [0,1];
+	var support = plotIndices.map(function(ii) {
+		var val = dFit.subset(math.index(ii,0));
+		return math.range(val - 1, val + 1, 0.1).toArray()
+	});
+	var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, support)
+	var data = new vis.DataSet();
 	var counter = 0;
-	console.dir(costMatrix);
 	math.forEach(costMatrix, function(c,ii) {
 		data.add({
 			id: counter++,
-			x:coefArrays[0][ii[0]],
-			y:coefArrays[1][ii[1]],
+			x:support[0][ii[0]],
+			y:support[1][ii[1]],
 			z:c,
 			style:c
 		});
