@@ -7,13 +7,34 @@
 
 %span Max data points:&nbsp;
 %input#var_maxN{type: "text", value: "25"}
-#theGraph{style: "width:600px;height:300px" }
-#buttons
-  %span.button#btn_clear Clear
-  |
-  %span.button#btn_descend{value: "off"} Descend  
-%div#hud{style: "width:600px;height:300px"}
-  %div#costPlot0{style: "width:200px;height:200px;background-color:black"}
+#main
+  #theGraph
+  #buttons
+    %span.button#btn_clear Clear
+    |
+    %span.button#btn_descend{value: "off"} Descend  
+  #hud
+    %div#costPlot0
 
 :css
+  #main {
+    width: 800px;
+    height: 500px;
+    position: relative
+  }
+  #theGraph {
+    width: 800px;
+    height: 500px;
+  }
+  #hud {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 20px;
+    right: 30px
+  }
+  #costPlot0 {
+    width:200px;
+    height:200px
+  }
   .button{cursor: pointer}
