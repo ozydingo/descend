@@ -112,6 +112,7 @@ function plotCost() {
 		yCenter: "35%",
 		width: container.width() + "px",
 		height: container.height() + "px",
+		backgroundColor: "transparent",
 		style: 'surface',
 		showPerspective: true,
 		showGrid: true,
