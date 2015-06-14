@@ -104,8 +104,9 @@ function plotCost() {
 
 	// specify options
 	var options = {
-		xLabel: "x[0]",
-		yLabel: "x[1]",
+		xLabel: "x0",
+		yLabel: "x1",
+		zLabel: "cost",
 		xStep: 0.5,
 		yStep: 0.5,
 		xStep: 0.5,
@@ -119,7 +120,7 @@ function plotCost() {
 		showShadow: false,
 		keepAspectRatio: true,
 		verticalRatio: 0.7,
-		cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 1.7}
+		cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
 	};
 
 	// Instantiate our graph object.
