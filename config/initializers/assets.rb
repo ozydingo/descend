@@ -6,4 +6,4 @@ Rails.application.config.assets.version = '1.0'
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
 # Rails.application.config.assets.precompile += %w( search.js )
-Rails.application.config.assets.precompile += %w(modeling.js xy_helper.js main.js)
+Rails.application.config.assets.precompile += %w(modeling.js xy_helper.js data_graph.js main.js)
