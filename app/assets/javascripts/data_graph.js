@@ -3,9 +3,31 @@
  * fit lines, and any HUDs
  */
 
-dataGraph = function() {
+dataGraph = function(mainDiv, options) {
 	var xyData, llmseFit, xPowers = [0,1];
 	var thePlot, descent, huds;
+	var divs;
+	descent = modeling.descent();
+
+	function initialize(mainDiv, options) {
+		divs = {
+			main: mainDiv,
+			clear: options["clear"],
+			descend: options["descend"],
+			maxN: options["maxN"]
+		}
+		getDiv("main").bind("plotclick", function(event, pos, item){
+			pushData(pos.x, pos.y);
+		});
+		getDiv("clear").click(clearData);
+		getDiv("descend").click(toggleDescent);
+		getDiv("maxN").change(updateData);
+		clearData();
+	}
+
+	function getDiv(which) {
+		return $("#" + divs[which])
+	}
 
 	function pushData(x,y) {
 		xyData.push([x, y]);
@@ -16,13 +38,13 @@ dataGraph = function() {
 		var descentEnabled = $("#btn_descend").attr("value");
 		if (descentEnabled === "off") {
 			descentEnabled = setInterval(descend, 20);
-			$("#btn_descend").text("Stop");
+			getDiv("descend").text("Stop");
 		} else {
 			clearInterval(descentEnabled);
 			descentEnabled = "off";
-			$("#btn_descend").text("Descend");
+			getDiv("descend").text("Descend");
 		}
-		$("#btn_descend").attr("value", descentEnabled);
+		getDiv("descend").attr("value", descentEnabled);
 	}
 
 	// generate callback for "the data has changed"
@@ -83,13 +105,13 @@ dataGraph = function() {
 			});
 		}
 
-		thePlot = $.plot("#theGraph", series, options);
+		thePlot = $.plot(getDiv("main"), series, options);
 		return thePlot;
 	}
 
 	// limit to manN data points
 	function pruneData(xyData) {
-		while (xyData.length > Number($("#var_maxN").val())) {xyData.shift()};
+		while (xyData.length > Number(getDiv("maxN").val())) {xyData.shift()};
 		return xyData
 	}
 
@@ -151,9 +173,7 @@ dataGraph = function() {
 		huds = new vis.Graph3d(container[0], data, options);
 	}
 
-	descent = modeling.descent();
-	clearData();
-
+	initialize(mainDiv, options);
 	return {
 		pushData: pushData,
 		toggleDescent: toggleDescent,
