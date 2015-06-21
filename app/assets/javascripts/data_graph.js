@@ -52,16 +52,14 @@ dataGraph = function(mainDiv, options) {
 	function updateData() {
 		xyData = pruneData(xyData);
 		llmseFit = xyHelper.llmse(xyData, xPowers);
-		plotIt();
-		huds.forEach(function(hud){hud.update()});
+		update();		
 	}
 
 	// run n iterations given current data
 	function descend(n) {
 		data = xyHelper.trainingData(xyData);
 		descent.step(data.features, data.outcomes, n);
-		plotIt();
-		huds.forEach(function(hud){hud.update()});
+		update();
 	}
 
 	function clearData() {
@@ -70,7 +68,7 @@ dataGraph = function(mainDiv, options) {
 	}
 
 	// general function to plot data and any fit lines
-	function plotIt() {
+	function update() {
 		// plot options
 		var options = {
 			grid: {clickable: true},
@@ -107,6 +105,8 @@ dataGraph = function(mainDiv, options) {
 		}
 
 		thePlot = $.plot(divs["main"], series, options);
+
+		huds.forEach(function(hud){hud.update()});
 		return thePlot;
 	}
 
@@ -186,7 +186,7 @@ dataGraph = function(mainDiv, options) {
 		updateData: updateData,
 		descend: descend,
 		clearData: clearData,
-		plotIt: plotIt,
+		update: update,
 		pruneData: pruneData,
 		getFitPlotData: getFitPlotData,
 	}
