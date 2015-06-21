@@ -127,11 +127,16 @@ dataGraph = function(mainDiv, options) {
 	function costHUD(divname) {
 		var viewCenter = [0, 0];
 		var xTent = [[-1.5, 1.5], [-1.5, 1.5]];
-		var zLim = [0, 10];
+		var zLim = [0, 2];
 		var div = getDiv(divname);
 		var graph;
+		var dot;
 
 		var alpha = 0.05;
+
+		function getView() {
+
+		}
 
 		function update() {
 			if (xyData.length==0) return;
@@ -189,8 +194,51 @@ dataGraph = function(mainDiv, options) {
 			};
 			graph = new vis.Graph3d(div[0], data, options);
 			return graph;
-
 		}
+
+		function update() {
+			if (xyData.length==0) return;
+
+			var d = xyHelper.trainingData(xyData);
+			var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
+			var cost = modeling.computeCost(d.features, d.outcomes, dFit)
+			var data = new vis.DataSet();
+			data.add({
+				id: 0,
+				x:dFit.toArray()[0],
+				y:dFit.toArray()[1],
+				z:cost
+			});
+
+			var options = {
+				xLabel: "x0",
+				yLabel: "x1",
+				zLabel: "cost",
+				xMin: 0, 
+				xMax: 1,
+				yMin: 0,
+				yMax: 1,
+				zMin: zLim[0],
+				zMax: zLim[1],
+				xStep: 1,
+				yStep: 1,
+				zStep: math.round((zLim[1] - zLim[0])/3,1),
+				yCenter: "35%",
+				width: div.width() + "px",
+				height: div.height() + "px",
+				backgroundColor: "transparent",
+				style: 'dot',
+				showPerspective: true,
+				showGrid: true,
+				showShadow: false,
+				keepAspectRatio: true,
+				verticalRatio: 0.7,
+				cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
+			};
+			graph = new vis.Graph3d(div[0], data, options);
+			return graph;
+		}
+
 		return {
 			graph: graph,
 			update: update
