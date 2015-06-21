@@ -125,8 +125,13 @@ dataGraph = function(mainDiv, options) {
 	}
 
 	function costHUD(divname) {
-		var xLim, yLim;
+		var viewCenter = [0, 0];
+		var xTent = [[-1.5, 1.5], [-1.5, 1.5]];
+		var zLim = [0, 10];
 		var div = getDiv(divname);
+		var graph;
+
+		var alpha = 0.05;
 
 		function update() {
 			if (xyData.length==0) return;
@@ -135,12 +140,17 @@ dataGraph = function(mainDiv, options) {
 			var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
 			var plotIndices = [0,1];
 			var support = plotIndices.map(function(ii) {
-				var val = dFit.subset(math.index(ii,0));
-				return math.range(val - 1, val + 1, 0.1).toArray()
+				var target = dFit.toArray()[ii];
+				var current = viewCenter[ii];
+				viewCenter[ii] = alpha * target + (1-alpha) * current;
+				var viewMin = math.round(viewCenter[ii] + xTent[ii][0], 3);
+				var viewMax = math.round(viewCenter[ii] + xTent[ii][1], 3);
+				return math.range(viewMin, viewMax, 0.1).toArray()
 			});
 			var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, support)
 			var data = new vis.DataSet();
 			var counter = 0;
+			var zMin = math.Infinity, zMax = -math.Infinity;
 			math.forEach(costMatrix, function(c,ii) {
 				data.add({
 					id: counter++,
@@ -149,16 +159,22 @@ dataGraph = function(mainDiv, options) {
 					z:c,
 					style:c
 				});
+				if (c < zMin) zMin = c;
+				if (c > zMax) zMax = c;
 			});
+			zLim[0] = alpha * zMin + (1-alpha) * zLim[0]
+			zLim[1] = alpha * zMax + (1-alpha) * zLim[1]
 
 			// specify options
 			var options = {
 				xLabel: "x0",
 				yLabel: "x1",
 				zLabel: "cost",
-				xStep: 0.5,
-				yStep: 0.5,
-				xStep: 0.5,
+				zMin: zLim[0],
+				zMax: zLim[1],
+				xStep: 1,
+				yStep: 1,
+				zStep: math.round((zLim[1] - zLim[0])/3,1),
 				yCenter: "35%",
 				width: div.width() + "px",
 				height: div.height() + "px",
@@ -171,11 +187,13 @@ dataGraph = function(mainDiv, options) {
 				verticalRatio: 0.7,
 				cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
 			};
-			return new vis.Graph3d(div[0], data, options)			
+			graph = new vis.Graph3d(div[0], data, options);
+			return graph;
 
 		}
 		return {
-			update: update,
+			graph: graph,
+			update: update
 		}
 	};
 
@@ -189,6 +207,7 @@ dataGraph = function(mainDiv, options) {
 		update: update,
 		pruneData: pruneData,
 		getFitPlotData: getFitPlotData,
+		huds: huds
 	}
 }
 
