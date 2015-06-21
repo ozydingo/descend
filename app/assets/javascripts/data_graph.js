@@ -26,7 +26,7 @@ dataGraph = function(mainDiv, options) {
 		divs["clear"].click(clearData);
 		divs["descend"].click(toggleDescent);
 		divs["maxN"].change(updateData);
-		huds = [costHUD("costPlot0")];
+		huds = [costHUD("costPlot")];
 		clearData();
 	}
 
@@ -124,19 +124,16 @@ dataGraph = function(mainDiv, options) {
 		return xyHelper.getFitLine(coefs, xPowers, xMin, xMax, 50)
 	}
 
-	function costHUD(divname) {
+	function costHUD(costDiv) {
 		var viewCenter = [0, 0];
 		var xTent = [[-1.5, 1.5], [-1.5, 1.5]];
+		var xLim = [[-1.5, 1.5], [-1.5, 1.5]]
 		var zLim = [0, 2];
-		var div = getDiv(divname);
-		var graph;
-		var dot;
+		var costDiv = getDiv(costDiv);
+		var costGraph;
+		var cameraPosition = {horizontal: -2.7, vertical: 0.5, distance: 2.2};
 
 		var alpha = 0.05;
-
-		function getView() {
-
-		}
 
 		function update() {
 			if (xyData.length==0) return;
@@ -148,21 +145,20 @@ dataGraph = function(mainDiv, options) {
 				var target = dFit.toArray()[ii];
 				var current = viewCenter[ii];
 				viewCenter[ii] = alpha * target + (1-alpha) * current;
-				var viewMin = math.round(viewCenter[ii] + xTent[ii][0], 3);
-				var viewMax = math.round(viewCenter[ii] + xTent[ii][1], 3);
-				return math.range(viewMin, viewMax, 0.1).toArray()
+				xLim[ii][0] = math.round(viewCenter[ii] + xTent[ii][0], 3);
+				xLim[ii][1] = math.round(viewCenter[ii] + xTent[ii][1], 3);
+				return math.range(xLim[ii][0], xLim[ii][1], 0.1).toArray()
 			});
 			var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, support)
-			var data = new vis.DataSet();
+			var costManifold = new vis.DataSet();
 			var counter = 0;
 			var zMin = math.Infinity, zMax = -math.Infinity;
 			math.forEach(costMatrix, function(c,ii) {
-				data.add({
+				costManifold.add({
 					id: counter++,
 					x:support[0][ii[0]],
 					y:support[1][ii[1]],
-					z:c,
-					style:c
+					z:c
 				});
 				if (c < zMin) zMin = c;
 				if (c > zMax) zMax = c;
@@ -175,14 +171,18 @@ dataGraph = function(mainDiv, options) {
 				xLabel: "x0",
 				yLabel: "x1",
 				zLabel: "cost",
+				xMin: xLim[0][0],
+				xMax: xLim[0][1],
+				yMin: xLim[1][0],
+				yMax: xLim[1][1],
 				zMin: zLim[0],
 				zMax: zLim[1],
 				xStep: 1,
 				yStep: 1,
 				zStep: math.round((zLim[1] - zLim[0])/3,1),
 				yCenter: "35%",
-				width: div.width() + "px",
-				height: div.height() + "px",
+				width: costDiv.width() + "px",
+				height: costDiv.height() + "px",
 				backgroundColor: "transparent",
 				style: 'surface',
 				showPerspective: true,
@@ -190,57 +190,25 @@ dataGraph = function(mainDiv, options) {
 				showShadow: false,
 				keepAspectRatio: true,
 				verticalRatio: 0.7,
-				cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
+				cameraPosition: cameraPosition
 			};
-			graph = new vis.Graph3d(div[0], data, options);
-			return graph;
+			costGraph = new vis.Graph3d(costDiv[0], costManifold, options);
+			costGraph.on('cameraPositionChange', onCameraPositionChange);
+			return costGraph;
 		}
 
-		function update() {
-			if (xyData.length==0) return;
-
-			var d = xyHelper.trainingData(xyData);
-			var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
-			var cost = modeling.computeCost(d.features, d.outcomes, dFit)
-			var data = new vis.DataSet();
-			data.add({
-				id: 0,
-				x:dFit.toArray()[0],
-				y:dFit.toArray()[1],
-				z:cost
-			});
-
-			var options = {
-				xLabel: "x0",
-				yLabel: "x1",
-				zLabel: "cost",
-				xMin: 0, 
-				xMax: 1,
-				yMin: 0,
-				yMax: 1,
-				zMin: zLim[0],
-				zMax: zLim[1],
-				xStep: 1,
-				yStep: 1,
-				zStep: math.round((zLim[1] - zLim[0])/3,1),
-				yCenter: "35%",
-				width: div.width() + "px",
-				height: div.height() + "px",
-				backgroundColor: "transparent",
-				style: 'dot',
-				showPerspective: true,
-				showGrid: true,
-				showShadow: false,
-				keepAspectRatio: true,
-				verticalRatio: 0.7,
-				cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
-			};
-			graph = new vis.Graph3d(div[0], data, options);
-			return graph;
+		function onCameraPositionChange(event) {
+			cameraPosition = {
+				horizontal: event.horizontal,
+				vertical: event.vertical,
+				distance: event.distance
+			}
 		}
+
+		function getCostGraph() { return costGraph}
 
 		return {
-			graph: graph,
+			getCostGraph: getCostGraph,
 			update: update
 		}
 	};

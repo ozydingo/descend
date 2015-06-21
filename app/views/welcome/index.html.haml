@@ -15,7 +15,8 @@
     |
     %span.button#btn_descend{value: "off"} Descend  
   #hud
-    %div#costPlot0
+    %div#costPlot
+    %div#costDot
 
 :css
   #main {
@@ -35,8 +36,9 @@
     right: 30px;
     opacity: 0.75
   }
-  #costPlot0 {
+  #costPlot {
     width:200px;
-    height:200px
+    height:200px;
+    position: absolute;
   }
   .button{cursor: pointer}
