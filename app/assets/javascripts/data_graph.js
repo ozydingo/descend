@@ -7,26 +7,27 @@ dataGraph = function(mainDiv, options) {
 	var xyData, llmseFit, xPowers = [0,1];
 	var thePlot, descent, huds;
 	var divs;
-	descent = modeling.descent();
+	var descent = modeling.descent();
+
+	function getDiv(name) {
+		return $("#" + name)
+	}
 
 	function initialize(mainDiv, options) {
 		divs = {
-			main: mainDiv,
-			clear: options["clear"],
-			descend: options["descend"],
-			maxN: options["maxN"]
+			main: getDiv(mainDiv),
+			clear: getDiv(options["clear"]),
+			descend: getDiv(options["descend"]),
+			maxN: getDiv(options["maxN"])
 		}
-		getDiv("main").bind("plotclick", function(event, pos, item){
+		divs["main"].bind("plotclick", function(event, pos, item){
 			pushData(pos.x, pos.y);
 		});
-		getDiv("clear").click(clearData);
-		getDiv("descend").click(toggleDescent);
-		getDiv("maxN").change(updateData);
+		divs["clear"].click(clearData);
+		divs["descend"].click(toggleDescent);
+		divs["maxN"].change(updateData);
+		huds = [costHUD("costPlot0")];
 		clearData();
-	}
-
-	function getDiv(which) {
-		return $("#" + divs[which])
 	}
 
 	function pushData(x,y) {
@@ -38,13 +39,13 @@ dataGraph = function(mainDiv, options) {
 		var descentEnabled = $("#btn_descend").attr("value");
 		if (descentEnabled === "off") {
 			descentEnabled = setInterval(descend, 20);
-			getDiv("descend").text("Stop");
+			divs["descend"].text("Stop");
 		} else {
 			clearInterval(descentEnabled);
 			descentEnabled = "off";
-			getDiv("descend").text("Descend");
+			divs["descend"].text("Descend");
 		}
-		getDiv("descend").attr("value", descentEnabled);
+		divs["descend"].attr("value", descentEnabled);
 	}
 
 	// generate callback for "the data has changed"
@@ -52,7 +53,7 @@ dataGraph = function(mainDiv, options) {
 		xyData = pruneData(xyData);
 		llmseFit = xyHelper.llmse(xyData, xPowers);
 		plotIt();
-		plotCost();
+		huds.forEach(function(hud){hud.update()});
 	}
 
 	// run n iterations given current data
@@ -60,7 +61,7 @@ dataGraph = function(mainDiv, options) {
 		data = xyHelper.trainingData(xyData);
 		descent.step(data.features, data.outcomes, n);
 		plotIt();
-		plotCost();
+		huds.forEach(function(hud){hud.update()});
 	}
 
 	function clearData() {
@@ -105,13 +106,13 @@ dataGraph = function(mainDiv, options) {
 			});
 		}
 
-		thePlot = $.plot(getDiv("main"), series, options);
+		thePlot = $.plot(divs["main"], series, options);
 		return thePlot;
 	}
 
 	// limit to manN data points
 	function pruneData(xyData) {
-		while (xyData.length > Number(getDiv("maxN").val())) {xyData.shift()};
+		while (xyData.length > Number(divs["maxN"].val())) {xyData.shift()};
 		return xyData
 	}
 
@@ -123,55 +124,60 @@ dataGraph = function(mainDiv, options) {
 		return xyHelper.getFitLine(coefs, xPowers, xMin, xMax, 50)
 	}
 
-	function plotCost() {
-		if (xyData.length==0) return;
+	function costHUD(divname) {
+		var xLim, yLim;
+		var div = getDiv(divname);
 
-		var d = xyHelper.trainingData(xyData);
-		var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
-		var plotIndices = [0,1];
-		var support = plotIndices.map(function(ii) {
-			var val = dFit.subset(math.index(ii,0));
-			return math.range(val - 1, val + 1, 0.1).toArray()
-		});
-		var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, support)
-		var data = new vis.DataSet();
-		var counter = 0;
-		math.forEach(costMatrix, function(c,ii) {
-			data.add({
-				id: counter++,
-				x:support[0][ii[0]],
-				y:support[1][ii[1]],
-				z:c,
-				style:c
+		function update() {
+			if (xyData.length==0) return;
+
+			var d = xyHelper.trainingData(xyData);
+			var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
+			var plotIndices = [0,1];
+			var support = plotIndices.map(function(ii) {
+				var val = dFit.subset(math.index(ii,0));
+				return math.range(val - 1, val + 1, 0.1).toArray()
 			});
-		});
+			var costMatrix = modeling.computeCostMatrix(d.features, d.outcomes, support)
+			var data = new vis.DataSet();
+			var counter = 0;
+			math.forEach(costMatrix, function(c,ii) {
+				data.add({
+					id: counter++,
+					x:support[0][ii[0]],
+					y:support[1][ii[1]],
+					z:c,
+					style:c
+				});
+			});
 
-		var container = $("#costPlot0")
+			// specify options
+			var options = {
+				xLabel: "x0",
+				yLabel: "x1",
+				zLabel: "cost",
+				xStep: 0.5,
+				yStep: 0.5,
+				xStep: 0.5,
+				yCenter: "35%",
+				width: div.width() + "px",
+				height: div.height() + "px",
+				backgroundColor: "transparent",
+				style: 'surface',
+				showPerspective: true,
+				showGrid: true,
+				showShadow: false,
+				keepAspectRatio: true,
+				verticalRatio: 0.7,
+				cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
+			};
+			return new vis.Graph3d(div[0], data, options)			
 
-		// specify options
-		var options = {
-			xLabel: "x0",
-			yLabel: "x1",
-			zLabel: "cost",
-			xStep: 0.5,
-			yStep: 0.5,
-			xStep: 0.5,
-			yCenter: "35%",
-			width: container.width() + "px",
-			height: container.height() + "px",
-			backgroundColor: "transparent",
-			style: 'surface',
-			showPerspective: true,
-			showGrid: true,
-			showShadow: false,
-			keepAspectRatio: true,
-			verticalRatio: 0.7,
-			cameraPosition: {horizontal: -2.7, vertical: 0.5, distance: 2.2}
-		};
-
-		// Instantiate our graph object.
-		huds = new vis.Graph3d(container[0], data, options);
-	}
+		}
+		return {
+			update: update,
+		}
+	};
 
 	initialize(mainDiv, options);
 	return {
@@ -183,6 +189,7 @@ dataGraph = function(mainDiv, options) {
 		plotIt: plotIt,
 		pruneData: pruneData,
 		getFitPlotData: getFitPlotData,
-		plotCost: plotCost
 	}
 }
+
+

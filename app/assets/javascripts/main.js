@@ -1,4 +1,3 @@
-//TODO: get rid of globals?
 var mainGraph;
 
 $(document).ready( function() {
