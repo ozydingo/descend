@@ -4,7 +4,7 @@
  *
  * A dynamic, browser-based visualization library.
  *
- * @version 4.3.0
+ * @version 4.3.1-SNAPSHOT
  * @date    2015-06-21
  *
  * @license
@@ -6597,6 +6597,8 @@ return /******/ (function(modules) { // webpackBootstrap
     this.animationPreload = false;
 
     this.camera = new Camera();
+    this.camera.setArmRotation(1.0, 0.5);
+    this.camera.setArmLength(1.7);
     this.eye = new Point3d(0, 0, -1); // TODO: set eye.z about 3/4 of the width of the window?
 
     this.dataTable = null; // The original data table
@@ -6624,11 +6626,14 @@ return /******/ (function(modules) { // webpackBootstrap
     this.yBarWidth = 1;
     // TODO: customize axis range
 
-    // constants
-    this.colorAxis = '#4D4D4D';
-    this.colorGrid = '#D3D3D3';
-    this.colorDot = '#7DC1FF';
-    this.colorDotBorder = '#3267D2';
+    // colors
+    this.axisColor = '#4D4D4D';
+    this.gridColor = '#D3D3D3';
+    this.dataColor = {
+      fill: '#7DC1FF',
+      stroke: '#3267D2',
+      strokeWidth: 1 // px
+    };
 
     // create a frame and canvas
     this.create();
@@ -7384,13 +7389,29 @@ return /******/ (function(modules) { // webpackBootstrap
       if (cameraPosition !== undefined) {
         this.camera.setArmRotation(cameraPosition.horizontal, cameraPosition.vertical);
         this.camera.setArmLength(cameraPosition.distance);
-      } else {
-        this.camera.setArmRotation(1.0, 0.5);
-        this.camera.setArmLength(1.7);
       }
-    }
 
-    this._setBackgroundColor(options && options.backgroundColor);
+      // colors
+      if (options.axisColor !== undefined) this.axisColor = options.axisColor;
+      if (options.gridColor !== undefined) this.gridColor = options.gridColor;
+      if (options.dataColor) {
+        if (typeof options.dataColor === 'string') {
+          this.dataColor.fill = options.dataColor;
+          this.dataColor.stroke = options.dataColor;
+        } else {
+          if (options.dataColor.fill) {
+            this.dataColor.fill = options.dataColor.fill;
+          }
+          if (options.dataColor.stroke) {
+            this.dataColor.stroke = options.dataColor.stroke;
+          }
+          if (options.dataColor.strokeWidth !== undefined) {
+            this.dataColor.strokeWidth = options.dataColor.strokeWidth;
+          }
+        }
+      }
+      this._setBackgroundColor(options.backgroundColor);
+    }
 
     this.setSize(this.width, this.height);
 
@@ -7493,14 +7514,14 @@ return /******/ (function(modules) { // webpackBootstrap
         ctx.stroke();
       }
 
-      ctx.strokeStyle = this.colorAxis;
+      ctx.strokeStyle = this.axisColor;
       ctx.strokeRect(left, top, widthMax, height);
     }
 
     if (this.style === Graph3d.STYLE.DOTSIZE) {
       // draw border around color bar
-      ctx.strokeStyle = this.colorAxis;
-      ctx.fillStyle = this.colorDot;
+      ctx.strokeStyle = this.axisColor;
+      ctx.fillStyle = this.dataColor.fill;
       ctx.beginPath();
       ctx.moveTo(left, top);
       ctx.lineTo(right, top);
@@ -7529,7 +7550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = this.colorAxis;
+        ctx.fillStyle = this.axisColor;
         ctx.fillText(step.getCurrent(), left - 2 * gridLineLen, y);
 
         step.next();
@@ -7651,7 +7672,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (this.showGrid) {
         from = this._convert3Dto2D(new Point3d(x, this.yMin, this.zMin));
         to = this._convert3Dto2D(new Point3d(x, this.yMax, this.zMin));
-        ctx.strokeStyle = this.colorGrid;
+        ctx.strokeStyle = this.gridColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7659,7 +7680,7 @@ return /******/ (function(modules) { // webpackBootstrap
       } else {
         from = this._convert3Dto2D(new Point3d(x, this.yMin, this.zMin));
         to = this._convert3Dto2D(new Point3d(x, this.yMin + gridLenX, this.zMin));
-        ctx.strokeStyle = this.colorAxis;
+        ctx.strokeStyle = this.axisColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7667,7 +7688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
         from = this._convert3Dto2D(new Point3d(x, this.yMax, this.zMin));
         to = this._convert3Dto2D(new Point3d(x, this.yMax - gridLenX, this.zMin));
-        ctx.strokeStyle = this.colorAxis;
+        ctx.strokeStyle = this.axisColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7687,7 +7708,7 @@ return /******/ (function(modules) { // webpackBootstrap
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
       }
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText('  ' + this.xValueLabel(step.getCurrent()) + '  ', text.x, text.y);
 
       step.next();
@@ -7705,7 +7726,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (this.showGrid) {
         from = this._convert3Dto2D(new Point3d(this.xMin, step.getCurrent(), this.zMin));
         to = this._convert3Dto2D(new Point3d(this.xMax, step.getCurrent(), this.zMin));
-        ctx.strokeStyle = this.colorGrid;
+        ctx.strokeStyle = this.gridColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7713,7 +7734,7 @@ return /******/ (function(modules) { // webpackBootstrap
       } else {
         from = this._convert3Dto2D(new Point3d(this.xMin, step.getCurrent(), this.zMin));
         to = this._convert3Dto2D(new Point3d(this.xMin + gridLenY, step.getCurrent(), this.zMin));
-        ctx.strokeStyle = this.colorAxis;
+        ctx.strokeStyle = this.axisColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7721,7 +7742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
         from = this._convert3Dto2D(new Point3d(this.xMax, step.getCurrent(), this.zMin));
         to = this._convert3Dto2D(new Point3d(this.xMax - gridLenY, step.getCurrent(), this.zMin));
-        ctx.strokeStyle = this.colorAxis;
+        ctx.strokeStyle = this.axisColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
@@ -7741,7 +7762,7 @@ return /******/ (function(modules) { // webpackBootstrap
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
       }
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText('  ' + this.yValueLabel(step.getCurrent()) + '  ', text.x, text.y);
 
       step.next();
@@ -7760,7 +7781,7 @@ return /******/ (function(modules) { // webpackBootstrap
     while (!step.end()) {
       // TODO: make z-grid lines really 3d?
       from = this._convert3Dto2D(new Point3d(xText, yText, step.getCurrent()));
-      ctx.strokeStyle = this.colorAxis;
+      ctx.strokeStyle = this.axisColor;
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(from.x - textMargin, from.y);
@@ -7768,7 +7789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText(this.zValueLabel(step.getCurrent()) + ' ', from.x - 5, from.y);
 
       step.next();
@@ -7776,7 +7797,7 @@ return /******/ (function(modules) { // webpackBootstrap
     ctx.lineWidth = 1;
     from = this._convert3Dto2D(new Point3d(xText, yText, this.zMin));
     to = this._convert3Dto2D(new Point3d(xText, yText, this.zMax));
-    ctx.strokeStyle = this.colorAxis;
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.lineTo(to.x, to.y);
@@ -7787,7 +7808,7 @@ return /******/ (function(modules) { // webpackBootstrap
     // line at yMin
     xMin2d = this._convert3Dto2D(new Point3d(this.xMin, this.yMin, this.zMin));
     xMax2d = this._convert3Dto2D(new Point3d(this.xMax, this.yMin, this.zMin));
-    ctx.strokeStyle = this.colorAxis;
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(xMin2d.x, xMin2d.y);
     ctx.lineTo(xMax2d.x, xMax2d.y);
@@ -7795,7 +7816,7 @@ return /******/ (function(modules) { // webpackBootstrap
     // line at ymax
     xMin2d = this._convert3Dto2D(new Point3d(this.xMin, this.yMax, this.zMin));
     xMax2d = this._convert3Dto2D(new Point3d(this.xMax, this.yMax, this.zMin));
-    ctx.strokeStyle = this.colorAxis;
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(xMin2d.x, xMin2d.y);
     ctx.lineTo(xMax2d.x, xMax2d.y);
@@ -7806,7 +7827,7 @@ return /******/ (function(modules) { // webpackBootstrap
     // line at xMin
     from = this._convert3Dto2D(new Point3d(this.xMin, this.yMin, this.zMin));
     to = this._convert3Dto2D(new Point3d(this.xMin, this.yMax, this.zMin));
-    ctx.strokeStyle = this.colorAxis;
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.lineTo(to.x, to.y);
@@ -7814,7 +7835,7 @@ return /******/ (function(modules) { // webpackBootstrap
     // line at xMax
     from = this._convert3Dto2D(new Point3d(this.xMax, this.yMin, this.zMin));
     to = this._convert3Dto2D(new Point3d(this.xMax, this.yMax, this.zMin));
-    ctx.strokeStyle = this.colorAxis;
+    ctx.strokeStyle = this.axisColor;
     ctx.beginPath();
     ctx.moveTo(from.x, from.y);
     ctx.lineTo(to.x, to.y);
@@ -7837,7 +7858,7 @@ return /******/ (function(modules) { // webpackBootstrap
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
       }
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText(xLabel, text.x, text.y);
     }
 
@@ -7858,7 +7879,7 @@ return /******/ (function(modules) { // webpackBootstrap
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
       }
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText(yLabel, text.x, text.y);
     }
 
@@ -7872,7 +7893,7 @@ return /******/ (function(modules) { // webpackBootstrap
       text = this._convert3Dto2D(new Point3d(xText, yText, zText));
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = this.colorAxis;
+      ctx.fillStyle = this.axisColor;
       ctx.fillText(zLabel, text.x - offset, text.y);
     }
   };
@@ -7931,6 +7952,9 @@ return /******/ (function(modules) { // webpackBootstrap
         s,
         v,
         zAvg;
+
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
 
     if (this.dataPoints === undefined || this.dataPoints.length <= 0) return; // TODO: throw exception?
 
@@ -7991,15 +8015,14 @@ return /******/ (function(modules) { // webpackBootstrap
             } else {
               v = 1;
               fillStyle = this._hsv2rgb(h, s, v);
-              strokeStyle = this.colorAxis;
+              strokeStyle = this.axisColor;
             }
           } else {
             fillStyle = 'gray';
-            strokeStyle = this.colorAxis;
+            strokeStyle = this.axisColor;
           }
-          lineWidth = 0.5;
 
-          ctx.lineWidth = lineWidth;
+          ctx.lineWidth = this._getStrokeWidth(point);
           ctx.fillStyle = fillStyle;
           ctx.strokeStyle = strokeStyle;
           ctx.beginPath();
@@ -8019,20 +8042,12 @@ return /******/ (function(modules) { // webpackBootstrap
         right = this.dataPoints[i].pointRight;
         top = this.dataPoints[i].pointTop;
 
-        if (point !== undefined) {
-          if (this.showPerspective) {
-            lineWidth = 2 / -point.trans.z;
-          } else {
-            lineWidth = 2 * -(this.eye.z / this.camera.getArmLength());
-          }
-        }
-
         if (point !== undefined && right !== undefined) {
           // calculate Hue from the current value. At zMin the hue is 240, at zMax the hue is 0
           zAvg = (point.point.z + right.point.z) / 2;
           h = (1 - (zAvg - this.zMin) * this.scale.z / this.verticalRatio) * 240;
 
-          ctx.lineWidth = lineWidth;
+          ctx.lineWidth = this._getStrokeWidth(point) * 2;
           ctx.strokeStyle = this._hsv2rgb(h, 1, 1);
           ctx.beginPath();
           ctx.moveTo(point.screen.x, point.screen.y);
@@ -8045,7 +8060,7 @@ return /******/ (function(modules) { // webpackBootstrap
           zAvg = (point.point.z + top.point.z) / 2;
           h = (1 - (zAvg - this.zMin) * this.scale.z / this.verticalRatio) * 240;
 
-          ctx.lineWidth = lineWidth;
+          ctx.lineWidth = this._getStrokeWidth(point) * 2;
           ctx.strokeStyle = this._hsv2rgb(h, 1, 1);
           ctx.beginPath();
           ctx.moveTo(point.screen.x, point.screen.y);
@@ -8054,6 +8069,18 @@ return /******/ (function(modules) { // webpackBootstrap
         }
       }
     }
+  };
+
+  Graph3d.prototype._getStrokeWidth = function (point) {
+    if (point !== undefined) {
+      if (this.showPerspective) {
+        return 1 / -point.trans.z * this.dataColor.strokeWidth;
+      } else {
+        return -(this.eye.z / this.camera.getArmLength()) * this.dataColor.strokeWidth;
+      }
+    }
+
+    return this.dataColor.strokeWidth;
   };
 
   /**
@@ -8095,7 +8122,7 @@ return /******/ (function(modules) { // webpackBootstrap
         //var from = this._convert3Dto2D(new Point3d(point.point.x, point.point.y, this.zMin));
         var from = this._convert3Dto2D(point.bottom);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = this.colorGrid;
+        ctx.strokeStyle = this.gridColor;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(point.screen.x, point.screen.y);
@@ -8127,8 +8154,8 @@ return /******/ (function(modules) { // webpackBootstrap
         color = this._hsv2rgb(hue, 1, 1);
         borderColor = this._hsv2rgb(hue, 1, 0.8);
       } else if (this.style === Graph3d.STYLE.DOTSIZE) {
-        color = this.colorDot;
-        borderColor = this.colorDotBorder;
+        color = this.dataColor.fill;
+        borderColor = this.dataColor.stroke;
       } else {
         // calculate Hue from the current value. At zMin the hue is 240, at zMax the hue is 0
         hue = (1 - (point.point.z - this.zMin) * this.scale.z / this.verticalRatio) * 240;
@@ -8137,7 +8164,7 @@ return /******/ (function(modules) { // webpackBootstrap
       }
 
       // draw the circle
-      ctx.lineWidth = 1.0;
+      ctx.lineWidth = this._getStrokeWidth(point);
       ctx.strokeStyle = borderColor;
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -8176,6 +8203,9 @@ return /******/ (function(modules) { // webpackBootstrap
     };
     this.dataPoints.sort(sortDepth);
 
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
     // draw the datapoints as bars
     var xWidth = this.xBarWidth / 2;
     var yWidth = this.yBarWidth / 2;
@@ -8190,8 +8220,8 @@ return /******/ (function(modules) { // webpackBootstrap
         color = this._hsv2rgb(hue, 1, 1);
         borderColor = this._hsv2rgb(hue, 1, 0.8);
       } else if (this.style === Graph3d.STYLE.BARSIZE) {
-        color = this.colorDot;
-        borderColor = this.colorDotBorder;
+        color = this.dataColor.fill;
+        borderColor = this.dataColor.stroke;
       } else {
         // calculate Hue from the current value. At zMin the hue is 240, at zMax the hue is 0
         hue = (1 - (point.point.z - this.zMin) * this.scale.z / this.verticalRatio) * 240;
@@ -8247,7 +8277,7 @@ return /******/ (function(modules) { // webpackBootstrap
       });
 
       // draw the ordered surfaces
-      ctx.lineWidth = 1;
+      ctx.lineWidth = this._getStrokeWidth(point);
       ctx.strokeStyle = borderColor;
       ctx.fillStyle = color;
       // NOTE: we start at j=2 instead of j=0 as we don't need to draw the two surfaces at the backside
@@ -8291,20 +8321,20 @@ return /******/ (function(modules) { // webpackBootstrap
     if (this.dataPoints.length > 0) {
       point = this.dataPoints[0];
 
-      ctx.lineWidth = 1; // TODO: make customizable
-      ctx.strokeStyle = 'blue'; // TODO: make customizable
+      ctx.lineWidth = this._getStrokeWidth(point);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = this.dataColor.stroke;
       ctx.beginPath();
       ctx.moveTo(point.screen.x, point.screen.y);
-    }
 
-    // draw the datapoints as colored circles
-    for (i = 1; i < this.dataPoints.length; i++) {
-      point = this.dataPoints[i];
-      ctx.lineTo(point.screen.x, point.screen.y);
-    }
+      // draw the datapoints as colored circles
+      for (i = 1; i < this.dataPoints.length; i++) {
+        point = this.dataPoints[i];
+        ctx.lineTo(point.screen.x, point.screen.y);
+      }
 
-    // finish the line
-    if (this.dataPoints.length > 0) {
+      // finish the line
       ctx.stroke();
     }
   };
@@ -27589,7 +27619,7 @@ return /******/ (function(modules) { // webpackBootstrap
         Node.parseOptions(this.options, options, true);
 
         // load the images
-        if (this.options.image !== undefined && this.options.image != '') {
+        if (this.options.image !== undefined) {
           if (this.imagelist) {
             this.imageObj = this.imagelist.load(this.options.image, this.options.brokenImage, this.id);
           } else {
@@ -30011,9 +30041,7 @@ return /******/ (function(modules) { // webpackBootstrap
           var id = ids[i];
           var edge = edges[id];
           if (edge !== undefined) {
-            if (edge.via != null) {
-              delete this.body.supportNodes[edge.via.id];
-            }
+            edge.edgeType.cleanup();
             edge.disconnect();
             delete edges[id];
           }
@@ -30709,7 +30737,7 @@ return /******/ (function(modules) { // webpackBootstrap
       value: function connect() {
         this.from = this.body.nodes[this.options.from];
         this.to = this.body.nodes[this.options.to];
-        if (this.from === undefined || this.to === undefined) {
+        if (this.from === undefined || this.to === undefined || this.options.physics === false) {
           this.via.setOptions({ physics: false });
         } else {
           // fix weird behaviour where a selfreferencing node has physics enabled
@@ -31007,7 +31035,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
     _createClass(EdgeBase, [{
       key: 'connect',
-      value: function connect() {}
+      value: function connect() {
+        this.from = this.body.nodes[this.options.from];
+        this.to = this.body.nodes[this.options.to];
+      }
     }, {
       key: 'cleanup',
       value: function cleanup() {
@@ -32496,6 +32527,11 @@ return /******/ (function(modules) { // webpackBootstrap
           iterations = this.options.stabilization.iterations;
         }
 
+        if (this.physicsBody.physicsNodeIndices.length === 0) {
+          this.ready = true;
+          return;
+        }
+
         // this sets the width of all nodes initially which could be required for the avoidOverlap
         this.body.emitter.emit('_resizeNodes');
 
@@ -32506,7 +32542,7 @@ return /******/ (function(modules) { // webpackBootstrap
         this.stabilized = false;
 
         // block redraw requests
-        this.body.emitter.emit('_blockRedrawRequests');
+        this.body.emitter.emit('_blockRedraw');
         this.targetIterations = iterations;
 
         // start the stabilization
@@ -32539,7 +32575,7 @@ return /******/ (function(modules) { // webpackBootstrap
     }, {
       key: '_finalizeStabilization',
       value: function _finalizeStabilization() {
-        this.body.emitter.emit('_allowRedrawRequests');
+        this.body.emitter.emit('_allowRedraw');
         if (this.options.stabilization.fit === true) {
           this.body.emitter.emit('fit');
         }
@@ -34523,7 +34559,7 @@ return /******/ (function(modules) { // webpackBootstrap
       this.renderingActive = false;
       this.renderRequests = 0;
       this.pixelRatio = undefined;
-      this.allowRedrawRequests = true;
+      this.allowRedraw = true;
 
       this.dragging = false;
       this.options = {};
@@ -34556,11 +34592,11 @@ return /******/ (function(modules) { // webpackBootstrap
             _this._redraw();
           }
         });
-        this.body.emitter.on('_blockRedrawRequests', function () {
-          _this.allowRedrawRequests = false;
+        this.body.emitter.on('_blockRedraw', function () {
+          _this.allowRedraw = false;
         });
-        this.body.emitter.on('_allowRedrawRequests', function () {
-          _this.allowRedrawRequests = true;
+        this.body.emitter.on('_allowRedraw', function () {
+          _this.allowRedraw = true;_this.redrawRequested = false;
         });
         this.body.emitter.on('_requestRedraw', this._requestRedraw.bind(this));
         this.body.emitter.on('_startRendering', function () {
@@ -34647,7 +34683,7 @@ return /******/ (function(modules) { // webpackBootstrap
       value: function _requestRedraw() {
         var _this2 = this;
 
-        if (this.redrawRequested !== true && this.renderingActive === false && this.allowRedrawRequests === true) {
+        if (this.redrawRequested !== true && this.renderingActive === false && this.allowRedraw === true) {
           this.redrawRequested = true;
           if (this.requiresTimeout === true) {
             window.setTimeout(function () {
@@ -34665,59 +34701,61 @@ return /******/ (function(modules) { // webpackBootstrap
       value: function _redraw() {
         var hidden = arguments[0] === undefined ? false : arguments[0];
 
-        this.body.emitter.emit('initRedraw');
+        if (this.allowRedraw === true) {
+          this.body.emitter.emit('initRedraw');
 
-        this.redrawRequested = false;
-        var ctx = this.canvas.frame.canvas.getContext('2d');
+          this.redrawRequested = false;
+          var ctx = this.canvas.frame.canvas.getContext('2d');
 
-        // when the container div was hidden, this fixes it back up!
-        if (this.canvas.frame.canvas.width === 0 || this.canvas.frame.canvas.height === 0) {
-          this.canvas.setSize();
-        }
-
-        if (this.pixelRatio === undefined) {
-          this.pixelRatio = (window.devicePixelRatio || 1) / (ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1);
-        }
-
-        ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
-
-        // clear the canvas
-        var w = this.canvas.frame.canvas.clientWidth;
-        var h = this.canvas.frame.canvas.clientHeight;
-        ctx.clearRect(0, 0, w, h);
-
-        // set scaling and translation
-        ctx.save();
-        ctx.translate(this.body.view.translation.x, this.body.view.translation.y);
-        ctx.scale(this.body.view.scale, this.body.view.scale);
-
-        ctx.beginPath();
-        this.body.emitter.emit('beforeDrawing', ctx);
-        ctx.closePath();
-
-        if (hidden === false) {
-          if (this.dragging === false || this.dragging === true && this.options.hideEdgesOnDrag === false) {
-            this._drawEdges(ctx);
+          // when the container div was hidden, this fixes it back up!
+          if (this.canvas.frame.canvas.width === 0 || this.canvas.frame.canvas.height === 0) {
+            this.canvas.setSize();
           }
-        }
 
-        if (this.dragging === false || this.dragging === true && this.options.hideNodesOnDrag === false) {
-          this._drawNodes(ctx, hidden);
-        }
+          if (this.pixelRatio === undefined) {
+            this.pixelRatio = (window.devicePixelRatio || 1) / (ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1);
+          }
 
-        if (this.controlNodesActive === true) {
-          this._drawControlNodes(ctx);
-        }
+          ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
 
-        ctx.beginPath();
-        //this.physics.nodesSolver._debug(ctx,"#F00F0F");
-        this.body.emitter.emit('afterDrawing', ctx);
-        ctx.closePath();
-        // restore original scaling and translation
-        ctx.restore();
-
-        if (hidden === true) {
+          // clear the canvas
+          var w = this.canvas.frame.canvas.clientWidth;
+          var h = this.canvas.frame.canvas.clientHeight;
           ctx.clearRect(0, 0, w, h);
+
+          // set scaling and translation
+          ctx.save();
+          ctx.translate(this.body.view.translation.x, this.body.view.translation.y);
+          ctx.scale(this.body.view.scale, this.body.view.scale);
+
+          ctx.beginPath();
+          this.body.emitter.emit('beforeDrawing', ctx);
+          ctx.closePath();
+
+          if (hidden === false) {
+            if (this.dragging === false || this.dragging === true && this.options.hideEdgesOnDrag === false) {
+              this._drawEdges(ctx);
+            }
+          }
+
+          if (this.dragging === false || this.dragging === true && this.options.hideNodesOnDrag === false) {
+            this._drawNodes(ctx, hidden);
+          }
+
+          if (this.controlNodesActive === true) {
+            this._drawControlNodes(ctx);
+          }
+
+          ctx.beginPath();
+          //this.physics.nodesSolver._debug(ctx,"#F00F0F");
+          this.body.emitter.emit('afterDrawing', ctx);
+          ctx.closePath();
+          // restore original scaling and translation
+          ctx.restore();
+
+          if (hidden === true) {
+            ctx.clearRect(0, 0, w, h);
+          }
         }
       }
     }, {
@@ -35063,7 +35101,7 @@ return /******/ (function(modules) { // webpackBootstrap
         this.hammer = new Hammer(this.frame.canvas);
         this.hammer.get('pinch').set({ enable: true });
         // enable to get better response, todo: test on mobile.
-        //this.hammer.get('pan').set({threshold:2});
+        this.hammer.get('pan').set({ threshold: 5, direction: 30 });
 
         hammerUtil.onTouch(this.hammer, function (event) {
           _this3.body.eventListeners.onTouch(event);
@@ -36093,12 +36131,12 @@ return /******/ (function(modules) { // webpackBootstrap
         this.drag.dragging = false;
         var selection = this.drag.selection;
         if (selection && selection.length) {
-          this.selectionHandler._generateClickEvent('dragEnd', event, this.getPointer(event.center));
           selection.forEach(function (s) {
             // restore original xFixed and yFixed
             s.node.options.fixed.x = s.xFixed;
             s.node.options.fixed.y = s.yFixed;
           });
+          this.selectionHandler._generateClickEvent('dragEnd', event, this.getPointer(event.center));
           this.body.emitter.emit('startSimulation');
         } else {
           this.selectionHandler._generateClickEvent('dragEnd', event, this.getPointer(event.center), undefined, true);
@@ -36625,11 +36663,13 @@ return /******/ (function(modules) { // webpackBootstrap
       key: '_zoomIn',
       value: function _zoomIn() {
         this.body.view.scale *= 1 + this.options.keyboard.speed.zoom;
+        this.body.emitter.emit('zoom', { direction: '+', scale: this.body.view.scale });
       }
     }, {
       key: '_zoomOut',
       value: function _zoomOut() {
         this.body.view.scale /= 1 + this.options.keyboard.speed.zoom;
+        this.body.emitter.emit('zoom', { direction: '-', scale: this.body.view.scale });
       }
     }, {
       key: 'configureKeyboardBindings',
@@ -37759,15 +37799,13 @@ return /******/ (function(modules) { // webpackBootstrap
           this.randomSeed = this.initialRandomSeed;
           for (var i = 0; i < nodesArray.length; i++) {
             var node = nodesArray[i];
-            if (!node.isFixed() && (node.x === undefined || node.y === undefined)) {
-              var radius = 10 * 0.1 * nodesArray.length + 10;
-              var angle = 2 * Math.PI * this.seededRandom();
-              if (node.options.fixed.x === false) {
-                node.x = radius * Math.cos(angle);
-              }
-              if (node.options.fixed.x === false) {
-                node.y = radius * Math.sin(angle);
-              }
+            var radius = 10 * 0.1 * nodesArray.length + 10;
+            var angle = 2 * Math.PI * this.seededRandom();
+            if (node.x === undefined) {
+              node.x = radius * Math.cos(angle);
+            }
+            if (node.y === undefined) {
+              node.y = radius * Math.sin(angle);
             }
           }
         }
@@ -38596,6 +38634,9 @@ return /******/ (function(modules) { // webpackBootstrap
                 // if for whatever reason the mode has changes (due to dataset change) disregard the callback) {
                 _this4.body.data.edges.getDataSet().remove(finalizedData.edges);
                 _this4.body.data.nodes.getDataSet().remove(finalizedData.nodes);
+                _this4.body.emitter.emit('startSimulation');
+                _this4.showManipulatorToolbar();
+              } else {
                 _this4.body.emitter.emit('startSimulation');
                 _this4.showManipulatorToolbar();
               }
