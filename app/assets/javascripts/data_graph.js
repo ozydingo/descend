@@ -135,6 +135,10 @@ dataGraph = function(mainDiv, options) {
 
 		var alpha = 0.05;
 
+		function initialize() {
+
+		}
+
 		function update() {
 			if (xyData.length==0) return;
 
@@ -192,8 +196,14 @@ dataGraph = function(mainDiv, options) {
 				verticalRatio: 0.7,
 				cameraPosition: cameraPosition
 			};
-			costGraph = new vis.Graph3d(costDiv[0], costManifold, options);
-			costGraph.on('cameraPositionChange', onCameraPositionChange);
+			if (costGraph === undefined) {
+				costGraph = new vis.Graph3d(costDiv[0], costManifold, options);
+				costGraph.on('cameraPositionChange', onCameraPositionChange);
+			} else {
+				costGraph.setOptions(options);
+				costGraph.setData(costManifold);
+			}
+
 			return costGraph;
 		}
 
