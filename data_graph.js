@@ -57,7 +57,7 @@ dataGraph = function(mainDiv, options) {
 
 	// run n iterations given current data
 	function descend(n) {
-		data = xyHelper.trainingData(xyData);
+		data = xyHelper.trainingData(xyData, xPowers);
 		descent.step(data.features, data.outcomes, n);
 		update();
 	}
