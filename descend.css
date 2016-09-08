@@ -1,0 +1,23 @@
+#main {
+	width: 800px;
+	height: 500px;
+	position: relative
+}
+#theGraph {
+	width: 800px;
+	height: 500px;
+}
+#hud {
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	top: 20px;
+	right: 30px;
+	opacity: 0.75
+}
+#costPlot {
+	width:200px;
+	height:200px;
+	position: absolute;
+}
+.button{cursor: pointer}

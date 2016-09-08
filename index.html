@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Descend</title>
+		<link href="descend.css" media="all" rel="stylesheet" />
+		<script src="lib/jquery-3.1.0.min.js"></script>
+		<script src="lib/jquery.flot.min.js"></script>
+		<script src="lib/math.js"></script>
+		<script src="lib/vis.js"></script>
+		<script src="main.js"></script>
+		<script src="data_graph.js"></script>
+		<script src="modeling.js"></script>
+		<script src="xy_helper.js"></script>
+	</head>
+
+	<body>
+		<h1>Descend</h1>
+		<span>Max data points:&nbsp;</span>
+		<input id='var_maxN' type='text' value='25'>
+			<div id='main'>
+				<div id='theGraph'></div>
+				<div id='buttons'>
+				<span class='button' id='btn_clear'>Clear</span>
+				|
+				<span class='button' id='btn_descend' value='off'>Descend</span>
+			</div>
+			<div id='hud'>
+				<div id='costPlot'></div>
+				<div id='costDot'></div>
+			</div>
+		</div>
+	</body>
+</html>
