@@ -4,10 +4,10 @@
  */
 
 dataGraph = function(mainDiv, options) {
-	var xyData, llmseFit, xPowers = [0,1];
+	var xyData, llmseFit, xPowers = [1];
 	var thePlot, descent, huds;
 	var divs;
-	var descent = modeling.descent();
+	var descent = gradientDescent(1);
 
 	function getDiv(name) {
 		return $("#" + name)
@@ -52,13 +52,14 @@ dataGraph = function(mainDiv, options) {
 	function updateData() {
 		xyData = pruneData(xyData);
 		llmseFit = xyHelper.llmse(xyData, xPowers);
-		update();		
+		update();
 	}
 
 	// run n iterations given current data
 	function descend(n) {
 		data = xyHelper.trainingData(xyData, xPowers);
-		descent.step(data.features, data.outcomes, n);
+		descent.setData(data.features, data.outcomes);
+		descent.step();
 		update();
 	}
 
@@ -94,9 +95,8 @@ dataGraph = function(mainDiv, options) {
 		}
 
 		// add descent fit line if it exists
-		var dFit;
-		if (dFit = descent.getCoefs()) {
-			var fitData = getFitPlotData(dFit);
+		if (descent.getNumObservations() > 0) {
+			var fitData = getFitPlotData(descent.getTheta());
 			series.push({
 				data: fitData,
 				lines: {show: true},
@@ -104,10 +104,13 @@ dataGraph = function(mainDiv, options) {
 			});
 		}
 
-		thePlot = $.plot(divs["main"], series, options);
-
+		thePlot = plot(series, options);
 		huds.forEach(function(hud){hud.update()});
 		return thePlot;
+	}
+
+	function plot(series, options) {
+		return $.plot(divs["main"], series, options);
 	}
 
 	// limit to manN data points
@@ -118,7 +121,8 @@ dataGraph = function(mainDiv, options) {
 
 	// return x,y data for llmse fit
 	function getFitPlotData(coefs) {
-		if (!coefs || coefs.size()[1]==0) return [];
+		if (thePlot == undefined) { return []; }
+		if (!coefs || coefs.size()[0]==0 || coefs.size()[1]==0) { return []; }
 		var xMin = thePlot.getAxes().xaxis.min;
 		var xMax = thePlot.getAxes().xaxis.max;
 		return xyHelper.getFitLine(coefs, xPowers, xMin, xMax, 50)
@@ -143,7 +147,7 @@ dataGraph = function(mainDiv, options) {
 			if (xyData.length==0) return;
 
 			var d = xyHelper.trainingData(xyData);
-			var dFit = descent.getCoefs() || math.matrix([[0],[0]]);
+			var dFit = descent.getTheta() || math.matrix([[0],[0]]);
 			var plotIndices = [0,1];
 			var support = plotIndices.map(function(ii) {
 				var target = dFit.toArray()[ii];
@@ -233,7 +237,7 @@ dataGraph = function(mainDiv, options) {
 		update: update,
 		pruneData: pruneData,
 		getFitPlotData: getFitPlotData,
-		huds: huds
+		huds: huds,
 	}
 }
 
