@@ -3,7 +3,7 @@
  * fit lines, and any HUDs
  */
 
-dataGraph = function(mainDiv, options) {
+dataGraph = function(container) {
 	var xyData, llmseFit, xPowers = [1];
 	var thePlot, descent, huds;
 	var divs;
@@ -13,12 +13,13 @@ dataGraph = function(mainDiv, options) {
 		return $("#" + name)
 	}
 
-	function initialize(mainDiv, options) {
+	function initialize(container) {
 		divs = {
-			main: getDiv(mainDiv),
-			clear: getDiv(options["clear"]),
-			descend: getDiv(options["descend"]),
-			maxN: getDiv(options["maxN"])
+			main: getDiv("mainGraph"),
+			aux: getDiv("auxGraphs"),
+			clear: getDiv("btn_clear"),
+			descend: getDiv("btn_descend"),
+			maxN: getDiv("text_maxN")
 		}
 		divs["main"].bind("plotclick", function(event, pos, item){
 			pushData(pos.x, pos.y);
@@ -227,7 +228,7 @@ dataGraph = function(mainDiv, options) {
 		}
 	};
 
-	initialize(mainDiv, options);
+	initialize(container);
 	return {
 		pushData: pushData,
 		toggleDescent: toggleDescent,

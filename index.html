@@ -17,19 +17,20 @@
 
 	<body>
 		<h1>Descend</h1>
-		<span>Max data points:&nbsp;</span>
-		<input id='var_maxN' type='text' value='25'>
-			<div id='main'>
-				<div id='theGraph'></div>
-				<div id='buttons'>
+		<div id='main'>
+			<div id='controls'>
+				<span>Max data points:&nbsp;</span>
+				<input id='text_maxN' type='text' value='25' style="width: 30px;">
+				|
 				<span class='button' id='btn_clear'>Clear</span>
 				|
 				<span class='button' id='btn_descend' value='off'>Descend</span>
 			</div>
-			<div id='hud'>
-				<div id='costPlot'></div>
-				<div id='costDot'></div>
+			<div id="auxGraphs">
+				<div id='costPlot' class='hud'></div>
+				<div id='costDot' class='hud'></div>
 			</div>
+			<div id='mainGraph'></div>
 		</div>
 	</body>
 </html>
