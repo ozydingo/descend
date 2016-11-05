@@ -1,5 +1,7 @@
 # Descend
 
+![Descend screenshot](descend.png)
+
 TODO
 
 Have a graph with adjustable axes. Allow users to set the learning parameter. Allow them to click on the graph to input new data and illustrate the current model at each step using gradient descent.
