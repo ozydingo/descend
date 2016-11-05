@@ -13,6 +13,14 @@ dataGraph = function(container) {
 		return $("#" + name)
 	}
 
+	function getDescent() {
+		return descent;
+	}
+
+	function getXYData() {
+		return xyData;
+	}
+
 	function initialize(container) {
 		divs = {
 			main: getDiv("mainGraph"),
@@ -230,6 +238,8 @@ dataGraph = function(container) {
 
 	initialize(container);
 	return {
+		getDescent: getDescent,
+		getXYData: getXYData,
 		pushData: pushData,
 		toggleDescent: toggleDescent,
 		updateData: updateData,
