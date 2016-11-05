@@ -1,15 +1,18 @@
 # Descend
 
+Interactive machine learning demonstrations. Wedpage has a clickable graph and controls to begin a gradient descent algorithm (TODO: more fun things!) and visualize the current model and history of costs given existing model & data.
+
 ![Descend screenshot](descend.png)
 
-TODO
+## Models
 
-Have a graph with adjustable axes. Allow users to set the learning parameter. Allow them to click on the graph to input new data and illustrate the current model at each step using gradient descent.
+ - Linear Regression (done)
+ - Logistic regression & classification (todo)
+ - Autoregressive model (todo)
+ - Basic neural net (todo)
 
-Also use the normal eq's to solve for the best model and display that simultaneously.
+## TODO
 
-Think about adding non-linear terms.
-
-Data import? Simple csv?
-
-A barebones Rails app, which can easily be deployed to Heroku.
+ - Adjustible learning rate parameter.
+ - Add non-linear terms (orders, sin).
+ - Add trace to costscape to show history of model param estimates
