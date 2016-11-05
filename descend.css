@@ -22,6 +22,9 @@
 	border-width: 1px;
 	border-color: #aaaaaa;
 }
+.hud-2 {
+	width: 400px;
+}
 #costPlot {
 	width: 200px;
 	height: 200px;
