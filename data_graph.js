@@ -86,8 +86,8 @@ dataGraph = function(container) {
 		// plot options
 		var options = {
 			grid: {clickable: true},
-			xaxis: {min: 0, max: 1},
-			yaxis: {min: 0, max: 1}
+			xaxis: {min: -1, max: 1},
+			yaxis: {min: -1, max: 1}
 		};
 
 		// Add data points to plot data
@@ -103,7 +103,8 @@ dataGraph = function(container) {
 			series.push({
 				data: fitData,
 				lines: {show: true},
-				color: "red"
+				color: "red",
+				label: "LMSE fit"
 			});
 		}
 
@@ -113,7 +114,8 @@ dataGraph = function(container) {
 			series.push({
 				data: fitData,
 				lines: {show: true},
-				color: "orange"
+				color: "orange",
+				label: "model fit"
 			});
 		}
 
