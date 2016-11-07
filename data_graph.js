@@ -9,17 +9,10 @@ dataGraph = function(container) {
 	var divs;
 	var descent = gradientDescent(1);
 
-	function getDiv(name) {
-		return $("#" + name)
-	}
-
-	function getDescent() {
-		return descent;
-	}
-
-	function getXYData() {
-		return xyData;
-	}
+	function getDiv(name) { return $("#" + name); }
+	function getDescent() { return descent; }
+	function getXYData() { return xyData; }
+	function getLlmseFit() { return llmseFit; }
 
 	function initialize(container) {
 		divs = {
@@ -148,6 +141,7 @@ dataGraph = function(container) {
 		linkHUD: linkHUD,
 		getDescent: getDescent,
 		getXYData: getXYData,
+		getLlmseFit: getLlmseFit,
 		pushData: pushData,
 		toggleDescent: toggleDescent,
 		updateData: updateData,
