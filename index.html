@@ -21,17 +21,18 @@
 		<h1>Descend</h1>
 		<div id='main'>
 			<div id='controls'>
+				<span>Model</span>
+				<select id="select_model">
+					<option value="linear_regression">Linear Regression</option>
+				<select>
+				|
 				<span>Max data points:&nbsp;</span>
 				<input id='text_maxN' type='text' value='25' style="width: 30px;">
 				|
 				<span class='button' id='btn_clear'>Clear</span>
 				|
 				<span class='button' id='btn_descend' value='off'>Descend</span>
-				|
-				<span>Model</span>
-				<select id="select_model">
-					<option value="linear_regression">Linear Regression</option>
-				<select>
+				</select>
 			</div>
 			<div id="auxGraphs">
 				<div id='costscape' class='hud'></div>
