@@ -31,5 +31,6 @@
 }
 .button {
 	cursor: pointer;
-	color: #922;
+	color: #228;
+	font-size: 2em;
 }

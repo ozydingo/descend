@@ -25,9 +25,12 @@ dataGraph = function(container) {
 		divs["main"].bind("plotclick", function(event, pos, item){
 			pushData(pos.x, pos.y);
 		});
-		divs["clear"].click(clearData);
-		divs["descend"].click(toggleDescent);
-		divs["maxN"].change(updateData);
+		$(document).on("click", "#btn_clear", clearData)
+		$(document).on("click", "#btn_descend", toggleDescent)
+		$(document).on("change", "#text_maxN", updateData)
+		// divs["clear"].click(clearData);
+		// divs["descend"].click(toggleDescent);
+		// divs["maxN"].change(updateData);
 		huds = [];
 		clearData();
 	}
@@ -42,16 +45,17 @@ dataGraph = function(container) {
 	}
 
 	function toggleDescent() {
-		var descentEnabled = $("#btn_descend").attr("value");
+		var descentEnabled = $("#btn_descend").attr("data-enabled");
 		if (descentEnabled === "off") {
-			descentEnabled = setInterval(descend, 20);
-			divs["descend"].text("Stop");
+			descentTimer = setInterval(descend, 20);
+			descentEnabled = "on";
+			divs["descend"].find("svg").html("<span class='fa fa-pause-circle'></span>")
 		} else {
-			clearInterval(descentEnabled);
+			clearInterval(descentTimer);
 			descentEnabled = "off";
-			divs["descend"].text("Descend");
+			divs["descend"].find("svg").html("<span class='fa fa-arrow-alt-circle-down'></span>")
 		}
-		divs["descend"].attr("value", descentEnabled);
+		divs["descend"].attr("data-enabled", descentEnabled);
 	}
 
 	// generate callback for "the data has changed"
@@ -153,5 +157,3 @@ dataGraph = function(container) {
 		huds: huds,
 	}
 }
-
-

@@ -3,6 +3,9 @@
 	<head>
 		<title>Descend</title>
 		<link href="descend.css" media="all" rel="stylesheet" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script>
+		<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script>
 		<script src="imported/jquery-3.1.0.min.js"></script>
 		<script src="imported/jquery.flot.min.js"></script>
 		<script src="imported/math.js"></script>
@@ -19,22 +22,28 @@
 
 	<body>
 		<h1>Descend</h1>
-		<p> Click on the graph to add data points, then hit play! </p>
+		<p> Click on the graph to add data points, then hit the descend button (<span class='fa fa-arrow-alt-circle-down'></span>)! </p>
 		<p> Check out the cost metrics below the graph </p>
 		<div id='main'>
 			<div id='controls'>
-				<span>Model</span>
-				<select id="select_model">
-					<option value="linear_regression">Linear Regression</option>
-				<select>
-				|
-				<span>Max data points:&nbsp;</span>
-				<input id='text_maxN' type='text' value='25' style="width: 30px;">
-				|
-				<span class='button' id='btn_clear'>Clear</span>
-				|
-				<span class='button' id='btn_descend' value='off'>Descend</span>
-				</select>
+				<div class='clearfix'>
+					<div class='pull-left'>
+						<span>Model</span>
+						<select id="select_model">
+							<option value="linear_regression">Linear Regression</option>
+						</select>
+						|
+						<span>Max data points:&nbsp;</span>
+						<input id='text_maxN' type='text' value='25' style="width: 30px;">
+					</div>
+					<div class='pull-right'>
+						<span id='btn_clear' class='button'>
+							<span class='fa fa-times-circle' aria-label="clear data"></span>
+						</span>
+						<span id='btn_descend' data-enabled='off' class='button'>
+							<span class='fa fa-arrow-alt-circle-down' aira-label="start descent"></span>
+						</span>
+					</div>
 			</div>
 			<div id='mainGraph'></div>
 			<div id="auxGraphs">
